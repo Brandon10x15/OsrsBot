@@ -1,43 +1,37 @@
 package net.runelite.rsb.wrappers;
 
-import com.google.gson.Gson;
-import com.google.gson.stream.JsonReader;
-import net.runelite.api.*;
-import net.runelite.api.coords.WorldPoint;
+import net.runelite.api.Actor;
+import net.runelite.api.NPC;
 import net.runelite.cache.definitions.NpcDefinition;
-import net.runelite.rsb.internal.globval.GlobalConfiguration;
 import net.runelite.rsb.methods.MethodContext;
 import net.runelite.rsb.wrappers.common.CacheProvider;
 import net.runelite.rsb.wrappers.common.Positionable;
 
-import javax.swing.text.Position;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.lang.ref.SoftReference;
 import java.util.HashMap;
 
 public class RSNPC extends RSCharacter implements CacheProvider<NpcDefinition> {
     private static HashMap<Integer, NpcDefinition> npcDefinitionCache;
     private static HashMap<Integer, File> npcFileCache;
-    private final SoftReference<NPC> npc;
+    private final NPC npc;
+    private final int id;
     private final NpcDefinition def;
 
     public RSNPC(final MethodContext ctx, final NPC npc) {
         super(ctx);
-        this.npc =  new SoftReference<>(npc);
-        this.def = (npc.getId() != -1) ? (NpcDefinition) createDefinition(npc.getId()) : null;
+        this.npc = npc;
+        this.id = npc.getId();
+        this.def = npc.getId() == -1 ? null : (NpcDefinition) createDefinition(npc.getId());
     }
 
     @Override
     public Actor getAccessor() {
-        return npc.get();
+        return this.npc;
     }
 
     @Override
     public Actor getInteracting() {
-        return getAccessor().getInteracting();
+        return this.getAccessor().getInteracting();
     }
 
     public String[] getActions() {
@@ -50,11 +44,7 @@ public class RSNPC extends RSCharacter implements CacheProvider<NpcDefinition> {
     }
 
     public int getID() {
-        NpcDefinition def = getDef();
-        if (def != null) {
-            return def.getId();
-        }
-        return -1;
+        return this.id;
     }
 
     public int getMaximumHP() {
@@ -70,16 +60,18 @@ public class RSNPC extends RSCharacter implements CacheProvider<NpcDefinition> {
     }
     @Override
     public String getName() {
+        return this.getAccessor().getName(); // Pulls name from NPC.
+        /*
         NpcDefinition def = getDef();
         if (def != null) {
             return def.getName();
         }
-        return "";
+        return "";*/
     }
 
     @Override
     public int getLevel() {
-        NPC c = npc.get();
+        NPC c = this.npc;
         if (c == null) {
             return -1;
         } else {
@@ -145,10 +137,10 @@ public class RSNPC extends RSCharacter implements CacheProvider<NpcDefinition> {
      * @return
      */
     public boolean hasLineOfSight(Positionable from) {
-        return methods.calc.hasLineOfSight(getNearestTile(from), from.getLocation());
+        return methods.calc.hasLineOfSight(getNearestTile(from).getWorldLocation().toWorldArea(), from.getLocation().getWorldLocation().toWorldArea());
     }
 
     public boolean hasLineOfSight() {
-        return methods.calc.hasLineOfSight(getNearestTile(methods.players.getMyPlayer()), methods.players.getMyPlayer().getLocation());
+        return methods.calc.hasLineOfSight(getNearestTile(methods.players.getMyPlayer()).getWorldLocation().toWorldArea(), methods.players.getMyPlayer().getLocation().getWorldLocation().toWorldArea());
     }
 }

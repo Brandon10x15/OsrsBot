@@ -1,13 +1,12 @@
 package net.runelite.rsb.wrappers.common;
 
 import lombok.extern.slf4j.Slf4j;
+import net.runelite.api.Point;
 import net.runelite.rsb.event.listener.PaintListener;
 import net.runelite.rsb.util.StdRandom;
-import net.runelite.api.Point;
 
 import java.awt.*;
 import java.awt.geom.PathIterator;
-
 
 import static net.runelite.rsb.methods.MethodProvider.methods;
 @Slf4j
@@ -59,16 +58,20 @@ public class ClickBox implements Clickable07, PaintListener {
 
     @Override
     public boolean doHover() {
-        Point point = getRandomPoint();
-        if (point != null && isClickable()) {
-            for (int i = 0; i < 3; i++) {
-                if (!contains(methods.mouse.getLocation())) {
-                    methods.mouse.move(point);
-                }
-                if (contains(methods.mouse.getLocation())) {
-                    return true;
+        try {
+            Point point = getRandomPoint();
+            if (point != null && isClickable()) {
+                for (int i = 0; i < 3; i++) {
+                    if (!contains(methods.mouse.getLocation())) {
+                        methods.mouse.move(point);
+                    }
+                    if (contains(methods.mouse.getLocation())) {
+                        return true;
+                    }
                 }
             }
+        } catch (Exception | Error e) {
+            e.printStackTrace();
         }
         return false;
     }

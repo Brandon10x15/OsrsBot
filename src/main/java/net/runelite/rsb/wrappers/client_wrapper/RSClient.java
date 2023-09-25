@@ -10,7 +10,7 @@ import net.runelite.client.callback.ClientThread;
 
 import javax.annotation.Nullable;
 import java.time.Instant;
-import java.util.*;
+import java.util.Queue;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.FutureTask;
@@ -125,6 +125,12 @@ public class RSClient extends BaseClientWrapper {
     public Widget getWidget(int packedID) { // tested, no need to runOnClientThread
         return convertResult(super.getWidget(packedID));
     }
+
+    @Override
+    public WidgetNode openInterface(int componentId, int interfaceId, int modalMode) {
+        return null;
+    }
+
     @Override
     public MapElementConfig getMapElementConfig(int id) {
         return convertResult(super.getMapElementConfig(id));
@@ -202,6 +208,21 @@ public class RSClient extends BaseClientWrapper {
     @Override
     public CollisionData[] getCollisionMaps() { // tested, causes freezes without runOnClientThread
         return runOnClientThread(super::getCollisionMaps);
+    }
+
+    @Override
+    public void setGpuFlags(int gpuflags) {
+
+    }
+
+    @Override
+    public void setExpandedMapLoading(int chunks) {
+
+    }
+
+    @Override
+    public int getExpandedMapLoading() {
+        return 0;
     }
 
     private class WidgetWrapper extends BaseWidgetWrapper {

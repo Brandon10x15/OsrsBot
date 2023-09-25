@@ -1,7 +1,7 @@
 package net.runelite.rsb.wrappers.client_wrapper;
 
-import net.runelite.api.*;
 import net.runelite.api.Point;
+import net.runelite.api.*;
 import net.runelite.api.annotations.Varp;
 import net.runelite.api.clan.ClanChannel;
 import net.runelite.api.clan.ClanSettings;
@@ -1244,11 +1244,6 @@ public abstract class BaseClientWrapper extends Applet implements Client {
     }
 
     @Override
-    public void setGpu(boolean gpu) {
-        wrappedClient.setGpu(gpu);
-    }
-
-    @Override
     public int get3dZoom() {
         return wrappedClient.get3dZoom();
     }
@@ -1281,11 +1276,6 @@ public abstract class BaseClientWrapper extends Applet implements Client {
     @Override
     public TextureProvider getTextureProvider() {
         return wrappedClient.getTextureProvider();
-    }
-
-    @Override
-    public void setRenderArea(boolean[][] renderArea) {
-        wrappedClient.setRenderArea(renderArea);
     }
 
     @Override

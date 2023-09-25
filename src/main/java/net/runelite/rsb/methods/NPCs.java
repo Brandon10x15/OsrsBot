@@ -74,15 +74,15 @@ public class NPCs extends MethodProvider {
         RSNPC closest = null;
         NPC[] npcs = getNPCs();
         for (NPC npc : npcs) {
-                RSNPC rsnpc = new RSNPC(methods, npc);
-                if (filter.test(rsnpc)) {
-                    int distance = methods.calc.distanceTo(rsnpc);
-                    if (distance < min) {
-                        min = distance;
-                        closest = rsnpc;
-                    }
+            RSNPC rsnpc = new RSNPC(methods, npc);
+            if (filter.test(rsnpc)) {
+                int distance = methods.calc.distanceTo(rsnpc);
+                if (distance < min) {
+                    min = distance;
+                    closest = rsnpc;
                 }
             }
+        }
         return closest;
     }
 
@@ -124,7 +124,29 @@ public class NPCs extends MethodProvider {
     public RSNPC getNearest(final String... names) {
         return getNearest(npc -> {
             for (String name : names) {
-                if (npc.getName().equals(name)) {
+                if (npc.getName().equalsIgnoreCase(name)) {
+                    return true;
+                }
+            }
+            return false;
+        });
+    }
+
+    public RSNPC getNearestNotInCombat(final int... ids) {
+        return getNearest(npc -> {
+            for (int id : ids) {
+                if (npc.getID() == id && !npc.isInCombat()) {
+                    return true;
+                }
+            }
+            return false;
+        });
+    }
+
+    public RSNPC getNearestNotInCombat(final String... names) {
+        return getNearest(npc -> {
+            for (String name : names) {
+                if (npc.getName().equalsIgnoreCase(name) && !npc.isInCombat()) {
                     return true;
                 }
             }

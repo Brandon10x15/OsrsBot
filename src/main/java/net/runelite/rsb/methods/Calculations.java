@@ -2,10 +2,11 @@ package net.runelite.rsb.methods;
 
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Perspective;
-import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.Point;
-import net.runelite.rsb.wrappers.common.Positionable;
+import net.runelite.api.coords.LocalPoint;
+import net.runelite.api.coords.WorldArea;
 import net.runelite.rsb.wrappers.RSTile;
+import net.runelite.rsb.wrappers.common.Positionable;
 
 import java.awt.*;
 
@@ -461,53 +462,50 @@ public class Calculations extends MethodProvider {
 				path_x[path_ptr] = curr_x + 1;
 				path_y[path_ptr] = curr_y - 1;
 				path_ptr = (path_ptr + 1) % pathLength;
-				prev[curr_x + 1][curr_y - 1] = 9;
-				dist[curr_x + 1][curr_y - 1] = cost;
-			}
-			// north east
-			if ((curr_x < 104 - 1) && (curr_y < 104 - 1) && (prev[curr_x + 1][curr_y + 1] == 0) && ((blocks[curr_x
-					+ 2][curr_y + 2] & 0x12801e0) == 0) && ((blocks[curr_x + 2][curr_y + 1] & 0x1280180) == 0) && (
-					(blocks[curr_x + 1][curr_y + 2] & 0x1280120) == 0)) {
-				path_x[path_ptr] = curr_x + 1;
-				path_y[path_ptr] = curr_y + 1;
-				path_ptr = (path_ptr + 1) % pathLength;
-				prev[curr_x + 1][curr_y + 1] = 12;
-				dist[curr_x + 1][curr_y + 1] = cost;
-			}
-		}
-		return foundPath ? dist[curr_x][curr_y] : -1;
-	}
+                prev[curr_x + 1][curr_y - 1] = 9;
+                dist[curr_x + 1][curr_y - 1] = cost;
+            }
+            // north east
+            if ((curr_x < 104 - 1) && (curr_y < 104 - 1) && (prev[curr_x + 1][curr_y + 1] == 0) && ((blocks[curr_x
+                    + 2][curr_y + 2] & 0x12801e0) == 0) && ((blocks[curr_x + 2][curr_y + 1] & 0x1280180) == 0) && (
+                    (blocks[curr_x + 1][curr_y + 2] & 0x1280120) == 0)) {
+                path_x[path_ptr] = curr_x + 1;
+                path_y[path_ptr] = curr_y + 1;
+                path_ptr = (path_ptr + 1) % pathLength;
+                prev[curr_x + 1][curr_y + 1] = 12;
+                dist[curr_x + 1][curr_y + 1] = cost;
+            }
+        }
+        return foundPath ? dist[curr_x][curr_y] : -1;
+    }
 
-	public static java.awt.Point convertRLPointToAWTPoint(Point point) {
-		return new java.awt.Point(point.getX(), point.getY());
-	}
+    public static java.awt.Point convertRLPointToAWTPoint(Point point) {
+        return new java.awt.Point(point.getX(), point.getY());
+    }
 
-	public boolean hasLineOfSight(RSTile start, RSTile end) {
-		return start.getTile(methods).hasLineOfSightTo(end.getTile(methods));
-	}
-	public boolean hasLineOfSight(RSTile end) {
-		return methods.players.getMyPlayer().getLocation().getTile(methods).hasLineOfSightTo(end.getTile(methods));
-	}
+    public boolean hasLineOfSight(WorldArea start, WorldArea end) {
+        return start.hasLineOfSightTo(methods.client, end);
+    }
 
-	static class Render {
-		float absoluteX1 = 0, absoluteX2 = 0;
-		float absoluteY1 = 0, absoluteY2 = 0;
-		int xMultiplier = 512, yMultiplier = 512;
-		int zNear = 50, zFar = 3500;
-	}
+    static class Render {
+        float absoluteX1 = 0, absoluteX2 = 0;
+        float absoluteY1 = 0, absoluteY2 = 0;
+        int xMultiplier = 512, yMultiplier = 512;
+        int zNear = 50, zFar = 3500;
+    }
 
-	static class RenderData {
-		float xOff = 0, xX = 32768, xY = 0, xZ = 0;
-		float yOff = 0, yX = 0, yY = 32768, yZ = 0;
-		float zOff = 0, zX = 0, zY = 0, zZ = 32768;
-	}
+    static class RenderData {
+        float xOff = 0, xX = 32768, xY = 0, xZ = 0;
+        float yOff = 0, yX = 0, yY = 32768, yZ = 0;
+        float zOff = 0, zX = 0, zY = 0, zZ = 32768;
+    }
 
-	public static final int[] SIN_TABLE = new int[16384];
-	public static final int[] COS_TABLE = new int[16384];
+    public static final int[] SIN_TABLE = new int[16384];
+    public static final int[] COS_TABLE = new int[16384];
 
-	static {
-		final double d = 0.00038349519697141029D;
-		for (int i = 0; i < 16384; i++) {
+    static {
+        final double d = 0.00038349519697141029D;
+        for (int i = 0; i < 16384; i++) {
 			Calculations.SIN_TABLE[i] = (int) (32768D * Math.sin(i * d));
 			Calculations.COS_TABLE[i] = (int) (32768D * Math.cos(i * d));
 		}

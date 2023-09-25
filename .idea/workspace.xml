@@ -10,11 +10,12 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="9a934c9c-1df5-401c-be85-1862717f067b" name="Default Changelist" comment="Fix workspace">
+      <change afterPath="$PROJECT_DIR$/OSRSBot.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/build.gradle" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/net/runelite/client/callback/Hooks.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/net/runelite/client/callback/Hooks.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/net/runelite/rsb/wrappers/RSModel.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/net/runelite/rsb/wrappers/RSModel.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/net/runelite/rsb/wrappers/RSObjectModel.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/net/runelite/rsb/wrappers/RSObjectModel.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/net/runelite/rsb/methods/Calculations.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/net/runelite/rsb/methods/Calculations.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/net/runelite/rsb/wrappers/RSNPC.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/net/runelite/rsb/wrappers/RSNPC.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/net/runelite/rsb/wrappers/client_wrapper/BaseClientWrapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/net/runelite/rsb/wrappers/client_wrapper/BaseClientWrapper.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/net/runelite/rsb/wrappers/client_wrapper/RSClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/net/runelite/rsb/wrappers/client_wrapper/RSClient.java" afterDir="false" />
     </list>
@@ -80,16 +81,16 @@
     </file-type-list>
   </component>
   <component name="HighlightingSettingsPerFile">
+    <setting file="file://$PROJECT_DIR$/src/main/java/net/runelite/rsb/wrappers/RSWidget.java" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/src/main/java/net/runelite/rsb/wrappers/RSItem.java" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/src/main/java/net/runelite/rsb/wrappers/RSObject.java" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/src/main/java/net/runelite/rsb/wrappers/common/CacheProvider.java" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/src/main/java/net/runelite/rsb/methods/Menu.java" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/src/main/java/net/runelite/rsb/methods/MethodContext.java" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/src/main/java/net/runelite/rsb/service/ScriptClassLoader.java" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/src/main/java/net/runelite/rsb/wrappers/RSCharacter.java" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/src/main/java/net/runelite/rsb/wrappers/RSItem.java" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/src/main/java/net/runelite/rsb/wrappers/RSNPC.java" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/src/main/java/net/runelite/rsb/wrappers/RSObject.java" root0="FORCE_HIGHLIGHTING" />
     <setting file="file://$PROJECT_DIR$/src/main/java/net/runelite/rsb/wrappers/RSPlayer.java" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/src/main/java/net/runelite/rsb/wrappers/RSWidget.java" root0="FORCE_HIGHLIGHTING" />
-    <setting file="file://$PROJECT_DIR$/src/main/java/net/runelite/rsb/wrappers/common/CacheProvider.java" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/src/main/java/net/runelite/rsb/methods/MethodContext.java" root0="FORCE_HIGHLIGHTING" />
+    <setting file="file://$PROJECT_DIR$/src/main/java/net/runelite/rsb/wrappers/RSNPC.java" root0="FORCE_HIGHLIGHTING" />
   </component>
   <component name="MarkdownSettingsMigration">
     <option name="stateVersion" value="1" />
@@ -111,7 +112,12 @@
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
+    <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="node.js.detected.package.eslint" value="true" />
+    <property name="node.js.detected.package.tslint" value="true" />
+    <property name="node.js.selected.package.eslint" value="(autodetect)" />
+    <property name="node.js.selected.package.tslint" value="(autodetect)" />
     <property name="project.structure.last.edited" value="Project" />
     <property name="project.structure.proportion" value="0.329653" />
     <property name="project.structure.side.proportion" value="0.0963939" />
@@ -130,7 +136,7 @@
       <recent name="C:\Users\gigia\IdeaProjects\RSB\src\main\java\rsb\images" />
     </key>
   </component>
-  <component name="RunManager" selected="Gradle.OsrsBot [botRun]">
+  <component name="RunManager" selected="Gradle.OSRSBot">
     <configuration default="true" type="Babashka" factoryName="BabashkaLocalRepl" activateToolWindowBeforeRun="false">
       <setting name="displayName" value="" />
       <setting name="bbPath" value="" />
@@ -167,11 +173,36 @@
       <setting name="focusEditor" value="false" />
       <method v="2" />
     </configuration>
+    <configuration name="OSRSBot" type="GradleRunConfiguration" factoryName="Gradle" temporary="true">
+      <ExternalSystemSettings>
+        <option name="executionName" />
+        <option name="externalProjectPath" value="$PROJECT_DIR$" />
+        <option name="externalSystemIdString" value="GRADLE" />
+        <option name="scriptParameters" />
+        <option name="taskDescriptions">
+          <list />
+        </option>
+        <option name="taskNames">
+          <list />
+        </option>
+        <option name="vmOptions" />
+      </ExternalSystemSettings>
+      <ExternalSystemDebugServerProcess>true</ExternalSystemDebugServerProcess>
+      <ExternalSystemReattachDebugProcess>true</ExternalSystemReattachDebugProcess>
+      <DebugAllEnabled>false</DebugAllEnabled>
+      <method v="2" />
+    </configuration>
     <list>
+      <item itemvalue="Gradle.OSRSBot" />
       <item itemvalue="Application.headlessBotRun" />
       <item itemvalue="Gradle.OsrsBot [botRun]" />
       <item itemvalue="Gradle.OsrsBot [headlessBotRun]" />
     </list>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Gradle.OSRSBot" />
+      </list>
+    </recent_temporary>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="SvnConfiguration">
@@ -184,6 +215,11 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1608232435561</updated>
+      <workItem from="1695502453191" duration="50000" />
+      <workItem from="1695504356959" duration="887000" />
+      <workItem from="1695510976790" duration="640000" />
+      <workItem from="1695512262911" duration="344000" />
+      <workItem from="1695515064603" duration="2088000" />
     </task>
     <task id="LOCAL-00001" summary="API is now functional. Updated a plethora of methods and revised the hook class. Some widget ids are likely broken and will need revisiting. I should really check on the shoddy built-in compilation sometime.">
       <created>1642044439045</created>
@@ -488,6 +524,9 @@
     </task>
     <option name="localTasksCounter" value="44" />
     <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
     <option name="TAB_STATES">

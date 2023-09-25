@@ -10,7 +10,8 @@ import net.runelite.rsb.wrappers.common.CacheProvider;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Slf4j
 public class Application {
@@ -44,36 +45,43 @@ public class Application {
 	 * @throws IOException If the file isn't found or is inaccessible then an IOException has occurred.
 	 */
 	private static void checkForCacheAndLoad() throws IOException {
-		String gameCacheLocation = GlobalConfiguration.Paths.getRuneLiteGameCacheDirectory();
-		String objectCacheLocation = GlobalConfiguration.Paths.getObjectsCacheDirectory();
-		String itemCacheLocation = GlobalConfiguration.Paths.getItemsCacheDirectory();
-		String npcCacheLocation = GlobalConfiguration.Paths.getNPCsCacheDirectory();
-		String spriteCacheLocation = GlobalConfiguration.Paths.getSpritesCacheDirectory();
-		//TODO Some sort of better validation here
-		//Add a version check
+        String gameCacheLocation = GlobalConfiguration.Paths.getRuneLiteGameCacheDirectory();
+        String objectCacheLocation = GlobalConfiguration.Paths.getObjectsCacheDirectory();
+        String itemCacheLocation = GlobalConfiguration.Paths.getItemsCacheDirectory();
+        String npcCacheLocation = GlobalConfiguration.Paths.getNPCsCacheDirectory();
+        String spriteCacheLocation = GlobalConfiguration.Paths.getSpritesCacheDirectory();
+        //TODO Some sort of better validation here
+        //Add a version check
 
-		if ((!new File(itemCacheLocation).exists()) || new File(itemCacheLocation).getTotalSpace() < 100) {
-			String[] itemArgs = {"--cache", gameCacheLocation,
-					"--items", itemCacheLocation};
-			String[] objectArgs = {"--cache", gameCacheLocation,
-					"--objects", objectCacheLocation};
-			String[] npcArgs = {"--cache", gameCacheLocation,
-					"--npcs", npcCacheLocation};
-			String[] spriteArgs = {"--cache", gameCacheLocation,
-					"--sprites", spriteCacheLocation};
+        if (!new File(itemCacheLocation).exists()) {
+            new File(itemCacheLocation).mkdir();
+        }
+        if (!new File(objectCacheLocation).exists()) {
+            new File(objectCacheLocation).mkdir();
+        }
+        if (!new File(npcCacheLocation).exists()) {
+            new File(npcCacheLocation).mkdir();
+        }
+        if (!new File(spriteCacheLocation).exists()) {
+            new File(spriteCacheLocation).mkdir();
+        }
+        if (new File(itemCacheLocation).getTotalSpace() < 100) {
+            String[] itemArgs = {"--cache", gameCacheLocation,
+                    "--items", itemCacheLocation};
+            String[] objectArgs = {"--cache", gameCacheLocation,
+                    "--objects", objectCacheLocation};
+            String[] npcArgs = {"--cache", gameCacheLocation,
+                    "--npcs", npcCacheLocation};
+            String[] spriteArgs = {"--cache", gameCacheLocation,
+                    "--sprites", spriteCacheLocation};
+            net.runelite.cache.Cache.main(itemArgs);
+            net.runelite.cache.Cache.main(objectArgs);
+            net.runelite.cache.Cache.main(npcArgs);
+            net.runelite.cache.Cache.main(spriteArgs);
+        }
+        CacheProvider.fillFileCache();
 
-			net.runelite.cache.Cache.main(itemArgs);
-			net.runelite.cache.Cache.main(objectArgs);
-			net.runelite.cache.Cache.main(npcArgs);
-			if (!new File(spriteCacheLocation).exists()) {
-				new File(spriteCacheLocation).mkdir();
-				net.runelite.cache.Cache.main(spriteArgs);
-			}
-		}
-		else {
-			CacheProvider.fillFileCache();
-		}
-	}
+    }
 
 	public static void setBot(int index) {
 		BotLiteInterface bot = getBots()[index];

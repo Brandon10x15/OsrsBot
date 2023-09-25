@@ -2,17 +2,14 @@ package net.runelite.rsb.script;
 
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.rsb.botLauncher.BotLite;
-import net.runelite.rsb.methods.MethodContext;
-import net.runelite.rsb.methods.Methods;
-import net.runelite.rsb.util.Timer;
-
-
-import net.runelite.rsb.plugin.AccountManager;
-import net.runelite.rsb.internal.BreakHandler;
 import net.runelite.rsb.event.EventMulticaster;
 import net.runelite.rsb.event.listener.PaintListener;
+import net.runelite.rsb.internal.BreakHandler;
+import net.runelite.rsb.methods.MethodContext;
+import net.runelite.rsb.methods.Methods;
+import net.runelite.rsb.plugin.AccountManager;
 import net.runelite.rsb.script.randoms.LoginBot;
-
+import net.runelite.rsb.util.Timer;
 
 import java.util.EventListener;
 import java.util.HashSet;
@@ -260,32 +257,34 @@ public abstract class Script extends Methods implements EventListener, Runnable 
 									sleep(5000);
 								} catch (ThreadDeath td) {
 									break;
-								}
-								continue;
-							} else {
-								h.tick();
-							}
-						}
-						if (checkForRandoms()) {
-							continue;
-						}
-						int timeOut = -1;
-						try {
-							timeOut = loop();
-						} catch (ThreadDeath td) {
-							break;
-						} catch (Exception ex) {
-							log.warn("Uncaught exception from script: ", ex);
-						}
-						if (timeOut == -1) {
-							break;
-						}
-						try {
-							sleep(timeOut);
-						} catch (ThreadDeath td) {
-							break;
-						}
-					} else {
+                                }
+                                continue;
+                            } else {
+                                h.tick();
+                            }
+                        }
+                        if (checkForRandoms()) {
+                            continue;
+                        }
+                        int timeOut = -1;
+                        try {
+                            timeOut = loop();
+                        } catch (ThreadDeath td) {
+                            break;
+                        } catch (NullPointerException ex) {
+                            log.warn("Null pointer exception from script: ", ex);
+                        } catch (Exception ex) {
+                            log.warn("Uncaught exception from script: ", ex);
+                        }
+                        if (timeOut == -1) {
+                            break;
+                        }
+                        try {
+                            sleep(timeOut);
+                        } catch (ThreadDeath td) {
+                            break;
+                        }
+                    } else {
 						try {
 							sleep(1000);
 						} catch (ThreadDeath td) {

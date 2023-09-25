@@ -1,17 +1,16 @@
 package net.runelite.rsb.wrappers;
 
 import lombok.extern.slf4j.Slf4j;
-import net.runelite.api.*;
+import net.runelite.api.Actor;
+import net.runelite.api.Model;
+import net.runelite.api.Player;
 import net.runelite.api.Point;
-import net.runelite.cache.definitions.NpcDefinition;
 import net.runelite.rsb.methods.MethodContext;
 import net.runelite.rsb.methods.MethodProvider;
 import net.runelite.rsb.util.OutputObjectComparer;
-import net.runelite.rsb.wrappers.common.CacheProvider;
 import net.runelite.rsb.wrappers.common.ClickBox;
 import net.runelite.rsb.wrappers.common.Clickable07;
 import net.runelite.rsb.wrappers.common.Positionable;
-import net.runelite.rsb.wrappers.RSTile;
 
 import java.awt.*;
 import java.lang.reflect.Field;
@@ -113,9 +112,15 @@ public abstract class RSCharacter extends MethodProvider implements Clickable07,
     public RSModel getModel() {
         Actor actor = getAccessor();
         if (actor != null) {
-            Model model = actor.getModel();
-            if (model != null) {
-                return new RSCharacterModel(methods, model, actor);
+            try {
+                if (actor.getName() != null) {
+                    return null;
+                }
+                Model model = actor.getModel();
+                if (model != null) {
+                    return new RSCharacterModel(methods, model, actor);
+                }
+            } catch (ArrayIndexOutOfBoundsException ignore) {
             }
         }
         return null;
@@ -307,7 +312,16 @@ public abstract class RSCharacter extends MethodProvider implements Clickable07,
     }
 
     public Shape getClickShape() {
-        return getAccessor().getConvexHull();
+        Shape shape = null;
+        if (this.getAccessor() == null) {
+            return shape;
+        }
+        try {
+            shape = this.getAccessor().getConvexHull();
+        } catch (NullPointerException e) {
+            e.printStackTrace();
+        }
+        return shape;
     }
     public ClickBox getClickBox() {
         return clickBox;
