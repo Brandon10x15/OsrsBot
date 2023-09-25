@@ -14,10 +14,12 @@ import java.lang.ref.SoftReference;
 public class RSPlayer extends RSCharacter {
 
 	private final SoftReference<Player> p;
+    private final MethodContext ctx;
 
 	public RSPlayer(final MethodContext ctx, final Player p) {
-		super(ctx);
-		this.p = new SoftReference<>(p);
+        super(ctx);
+        this.ctx = ctx;
+        this.p = new SoftReference<>(p);
 	}
 
 	public Actor getAccessor() {
@@ -37,11 +39,11 @@ public class RSPlayer extends RSCharacter {
 	}
 
 	public boolean isLocalPlayerMoving() {
-		if (methods.client.getLocalDestinationLocation() != null) {
-			return methods.client.getLocalPlayer().getLocalLocation() == methods.client.getLocalDestinationLocation();
-		}
-		return false;
-	}
+        if (ctx.client.getLocalDestinationLocation() != null) {
+            return ctx.client.getLocalPlayer().getLocalLocation() == ctx.client.getLocalDestinationLocation();
+        }
+        return false;
+    }
 
 	public boolean isMoving() {
 		var poseAnimation = getAccessor().getPoseAnimation();
@@ -81,25 +83,25 @@ public class RSPlayer extends RSCharacter {
 			Point screenLoc;
 			for (int i = 0; i < 20; i++) {
 				screenLoc = getScreenLocation();
-				if (!isValid() || !methods.calc.pointOnScreen(screenLoc)) {
-					return false;
-				}
-				if (methods.mouse.getLocation().equals(screenLoc)) {
-					break;
-				}
-				methods.mouse.move(screenLoc);
+                if (!isValid() || !ctx.calc.pointOnScreen(screenLoc)) {
+                    return false;
+                }
+                if (ctx.mouse.getLocation().equals(screenLoc)) {
+                    break;
+                }
+                ctx.mouse.move(screenLoc);
 			}
-			MenuEntry[] entries = methods.menu.getEntries();
+            MenuEntry[] entries = ctx.menu.getEntries();
 			if (entries.length <= 1) {
 				return false;
 			}
 			if (entries[0].getOption().toLowerCase().contains(action.toLowerCase())) {
-				methods.mouse.click(true);
+                ctx.mouse.click(true);
 				return true;
 			} else {
-				methods.mouse.click(false);
-				return methods.menu.doAction(action, target);
-			}
+                ctx.mouse.click(false);
+                return ctx.menu.doAction(action, target);
+            }
 		} catch (Exception e) {
 			e.printStackTrace();
 			return false;

@@ -2,16 +2,11 @@ package net.runelite.rsb.query.result;
 
 import net.runelite.rsb.util.StdRandom;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class QueryResult<T> implements Collection<T> {
-    private List<T> objects;
+    private List objects;
 
     public QueryResult(List<T> list) {
         objects = list;

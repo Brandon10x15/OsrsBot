@@ -17,9 +17,11 @@ public class RSNPC extends RSCharacter implements CacheProvider<NpcDefinition> {
     private final SoftReference<NPC> npc;
     private final int id;
     private final NpcDefinition def;
+    private final MethodContext ctx;
 
     public RSNPC(final MethodContext ctx, final NPC npc) {
         super(ctx);
+        this.ctx = ctx;
         this.npc = new SoftReference<>(npc);
         this.id = npc.getId();
         this.def = npc.getId() == -1 ? null : (NpcDefinition) createDefinition(npc.getId());
@@ -49,7 +51,8 @@ public class RSNPC extends RSCharacter implements CacheProvider<NpcDefinition> {
     }
 
     public int getMaximumHP() {
-        return methods.runeLite.getNPCManager().getHealth(getID());
+        Integer hp = ctx.runeLite.getNPCManager().getHealth(getID());
+        return hp != null ? hp : -1;
     }
 
     public int getCurrentHP() {
@@ -88,7 +91,7 @@ public class RSNPC extends RSCharacter implements CacheProvider<NpcDefinition> {
     public boolean isInteractingWithLocalPlayer() {
         RSNPC npc = this;
         return npc.getInteracting() != null
-                && npc.getInteracting().equals(methods.players.getMyPlayer().getAccessor());
+                && npc.getInteracting().equals(ctx.players.getMyPlayer().getAccessor());
     }
 
     public NpcDefinition getDef() {
@@ -128,7 +131,7 @@ public class RSNPC extends RSCharacter implements CacheProvider<NpcDefinition> {
     }
 
     public RSTile getNearestTile() {
-        return getNearestTile(getLocation(), methods.players.getMyPlayer());
+        return getNearestTile(getLocation(), ctx.players.getMyPlayer());
     }
 
     /**
@@ -138,10 +141,10 @@ public class RSNPC extends RSCharacter implements CacheProvider<NpcDefinition> {
      * @return
      */
     public boolean hasLineOfSight(Positionable from) {
-        return methods.calc.hasLineOfSight(getNearestTile(from).getWorldLocation().toWorldArea(), from.getLocation().getWorldLocation().toWorldArea());
+        return ctx.calc.hasLineOfSight(getNearestTile(from).getWorldLocation().toWorldArea(), from.getLocation().getWorldLocation().toWorldArea());
     }
 
     public boolean hasLineOfSight() {
-        return methods.calc.hasLineOfSight(getNearestTile(methods.players.getMyPlayer()).getWorldLocation().toWorldArea(), methods.players.getMyPlayer().getLocation().getWorldLocation().toWorldArea());
+        return ctx.calc.hasLineOfSight(getNearestTile(ctx.players.getMyPlayer()).getWorldLocation().toWorldArea(), ctx.players.getMyPlayer().getLocation().getWorldLocation().toWorldArea());
     }
 }

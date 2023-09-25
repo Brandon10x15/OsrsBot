@@ -4,6 +4,7 @@ import net.runelite.api.widgets.Widget;
 import net.runelite.api.widgets.WidgetItem;
 import net.runelite.rsb.methods.MethodContext;
 import net.runelite.rsb.methods.MethodProvider;
+import net.runelite.rsb.methods.Web;
 import net.runelite.rsb.wrappers.common.ClickBox;
 import net.runelite.rsb.wrappers.common.Clickable07;
 
@@ -15,10 +16,13 @@ public class RSWidgetItem extends MethodProvider implements Clickable07 {
     private final WidgetItem item;
     private final Widget parent;
 
-    private final ClickBox clickBox = new ClickBox(this);
+    private final ClickBox clickBox;
+    private final MethodContext ctx;
 
     RSWidgetItem(MethodContext ctx, WidgetItem item) {
         super(ctx);
+        this.ctx = Web.methods;
+        this.clickBox = new ClickBox(this.ctx, this);
         this.item = item;
         this.parent = item.getWidget();
     }

@@ -2,13 +2,11 @@ package net.runelite.rsb.wrappers;
 
 import net.runelite.api.Tile;
 import net.runelite.api.TileItem;
-import net.runelite.rsb.methods.GroundItems;
 import net.runelite.rsb.methods.MethodContext;
 import net.runelite.rsb.methods.MethodProvider;
 import net.runelite.rsb.wrappers.common.ClickBox;
 import net.runelite.rsb.wrappers.common.Clickable07;
 import net.runelite.rsb.wrappers.common.Positionable;
-import net.runelite.rsb.wrappers.RSTile;
 
 import java.awt.*;
 import java.util.List;
@@ -17,29 +15,32 @@ import java.util.List;
  * Represents an item on a tile.
  */
 public class RSGroundItem extends MethodProvider implements Clickable07, Positionable {
-	private final RSItem groundItem;
-	private final RSTile location;
-	private final ClickBox clickBox = new ClickBox(this);
+    private final RSItem groundItem;
+    private final RSTile location;
+    private final ClickBox clickBox;
+    private final MethodContext ctx;
 
-	public RSGroundItem(final MethodContext ctx, final RSTile location, final RSItem groundItem) {
-		super(ctx);
-		this.location = location;
-		this.groundItem = groundItem;
-	}
+    public RSGroundItem(final MethodContext ctx, final RSTile location, final RSItem groundItem) {
+        super(ctx);
+        this.ctx = ctx;
+        this.clickBox = new ClickBox(this.ctx, this);
+        this.location = location;
+        this.groundItem = groundItem;
+    }
 
-	/**
+    /**
 	 * Gets the top model on the tile of this ground item.
 	 *
 	 * @return The top model on the tile of this ground item.
 	 */
 	public RSModel getModel() {
-		Tile tile = location.getTile(methods);
+        Tile tile = location.getTile(ctx);
 		if (tile != null) {
 			List<TileItem> groundItems = tile.getGroundItems();
 			if (groundItems != null && !groundItems.isEmpty()) {
-				return (tile.getItemLayer().getTop() != null) ?
-						new RSGroundObjectModel(methods, tile.getItemLayer().getTop().getModel(), tile) :
-						new RSGroundObjectModel(methods, groundItems.get(0).getModel(), tile);
+                return (tile.getItemLayer().getTop() != null) ?
+                        new RSGroundObjectModel(ctx, tile.getItemLayer().getTop().getModel(), tile) :
+                        new RSGroundObjectModel(ctx, groundItems.get(0).getModel(), tile);
 			}
 		}
 		return null;
@@ -66,8 +67,8 @@ public class RSGroundItem extends MethodProvider implements Clickable07, Positio
 		if (getClickBox().doAction(action, option)) {
 			return true;
 		}
-		return methods.tiles.doAction(getLocation(), random(0.45, 0.55), random(0.45, 0.55), 0,
-				action, option);
+        return ctx.tiles.doAction(getLocation(), random(0.45, 0.55), random(0.45, 0.55), 0,
+                action, option);
 	}
 
 	public RSItem getItem() {
@@ -81,22 +82,19 @@ public class RSGroundItem extends MethodProvider implements Clickable07, Positio
 	public boolean isOnScreen() {
 		RSModel model = getModel();
 		if (model == null) {
-			return methods.calc.tileOnScreen(location);
+            return ctx.calc.tileOnScreen(location);
 		} else {
-			return methods.calc.pointOnScreen(model.getPoint());
+            return ctx.calc.pointOnScreen(model.getPoint());
 		}
 	}
 
 	public boolean turnTo() {
-		RSGroundItem item = this;
-		if(item != null) {
-			if(!item.isOnScreen()) {
-				methods.camera.turnTo(item.getLocation());
-				return item.isOnScreen();
-			}
-		}
-		return false;
-	}
+        if (!isOnScreen()) {
+            ctx.camera.turnTo(getLocation());
+            return isOnScreen();
+        }
+        return false;
+    }
 
 	public boolean doHover() {
 		return getClickBox().doHover();

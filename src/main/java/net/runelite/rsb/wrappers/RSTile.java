@@ -1,8 +1,8 @@
 package net.runelite.rsb.wrappers;
 
 import lombok.extern.slf4j.Slf4j;
-import net.runelite.api.*;
 import net.runelite.api.Point;
+import net.runelite.api.Tile;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.rsb.methods.MethodContext;
@@ -10,7 +10,6 @@ import net.runelite.rsb.methods.Web;
 import net.runelite.rsb.wrappers.common.ClickBox;
 import net.runelite.rsb.wrappers.common.Clickable07;
 import net.runelite.rsb.wrappers.common.Positionable;
-import net.runelite.rsb.wrappers.RSTile;
 
 import java.awt.*;
 
@@ -29,18 +28,23 @@ public class RSTile implements Clickable07, Positionable {
     private MethodContext ctx;
     private TYPES type;
 
+    private final ClickBox clickBox;
+
     public enum TYPES {
         ANIMABLE, LOCAL, WORLD, SCENE;
     }
+
     /**
      * Creates an RSTile object based on a RuneScape tile object.
-     * @param tile  The RuneScape tile to assign coordinates from
+     *
+     * @param tile The RuneScape tile to assign coordinates from
      */
     public RSTile(Tile tile) {
         this.x = tile.getWorldLocation().getX();
         this.y = tile.getWorldLocation().getY();
         this.plane = tile.getWorldLocation().getPlane();
         this.ctx = Web.methods;
+        this.clickBox = new ClickBox(this.ctx, this);
         type = TYPES.WORLD;
     }
 
@@ -55,6 +59,7 @@ public class RSTile implements Clickable07, Positionable {
         this.y = y;
         this.plane = plane;
         this.ctx = Web.methods;
+        this.clickBox = new ClickBox(this.ctx, this);
         this.type = TYPES.WORLD;
     }
 
@@ -68,6 +73,8 @@ public class RSTile implements Clickable07, Positionable {
     public RSTile(int x, int y) {
         this.x = x;
         this.y = y;
+        this.ctx = Web.methods;
+        this.clickBox = new ClickBox(this.ctx, this);
 
         //Creates a debug for later development to fix instances in the API where this occurs
         String debugMsg =
@@ -94,6 +101,7 @@ public class RSTile implements Clickable07, Positionable {
         this.y = worldPoint.getY();
         this.plane = worldPoint.getPlane();
         this.ctx = Web.methods;
+        this.clickBox = new ClickBox(this.ctx, this);
         type = TYPES.WORLD;
     }
 
@@ -241,7 +249,7 @@ public class RSTile implements Clickable07, Positionable {
         return ctx.calc.getTileBoundsPoly(this.toWorldTile(), 0);
     }
     public ClickBox getClickBox() {
-        return new ClickBox(this);
+        return clickBox;
     }
 
     @Override

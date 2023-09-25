@@ -22,11 +22,14 @@ public abstract class RSCharacter extends MethodProvider implements Clickable07,
     private static ArrayList<Field> pathFields = new ArrayList<>();
     private static int pathXIndex = -1;
     private static int pathYIndex = -1;
+    private final MethodContext ctx;
 
-    private final ClickBox clickBox = new ClickBox(this);
+    private final ClickBox clickBox;
 
     public RSCharacter(MethodContext ctx) {
         super(ctx);
+        this.ctx = ctx;
+        this.clickBox = new ClickBox(this.ctx, this);
     }
 
     /**
@@ -79,9 +82,9 @@ public abstract class RSCharacter extends MethodProvider implements Clickable07,
         }
         pathFields.sort(Comparator.comparing(Field::getName));
             try {
-            if (methods.client.getLocalPlayer() != null)
-                //Attempt to accurately decide which set is which (Hopefully this is never relied on)
-                pathXIndex = (((int[]) pathFields.get(0).get(methods.client.getLocalPlayer()))[0] == methods.client.getLocalPlayer().getLocalLocation().getSceneX()) ? 0 : 1;
+                if (ctx.client.getLocalPlayer() != null)
+                    //Attempt to accurately decide which set is which (Hopefully this is never relied on)
+                    pathXIndex = (((int[]) pathFields.get(0).get(ctx.client.getLocalPlayer()))[0] == ctx.client.getLocalPlayer().getLocalLocation().getSceneX()) ? 0 : 1;
             pathYIndex = (pathXIndex == 0) ? 1 : 0;
         } catch (IllegalAccessException e) {
             log.error("Accessed reflected object incorrectly", e.getCause());
@@ -106,7 +109,7 @@ public abstract class RSCharacter extends MethodProvider implements Clickable07,
      * @return <code>true</code> if the option was found; otherwise <code>false</code>.
      */
     public boolean doAction(final String action, final String option) {
-        return getClickBox().doAction(action, option);
+        return this.clickBox.doAction(action, option);
     }
 
     public RSModel getModel() {
@@ -114,7 +117,7 @@ public abstract class RSCharacter extends MethodProvider implements Clickable07,
         if (actor != null) {
             Model model = actor.getModel();
             if (model != null) {
-                return new RSCharacterModel(methods, model, actor);
+                return new RSCharacterModel(ctx, model, actor);
             }
         }
         return null;
@@ -160,9 +163,9 @@ public abstract class RSCharacter extends MethodProvider implements Clickable07,
      */
     public Point getMinimapLocation() {
         Actor actor = getAccessor();
-        int actorX = methods.client.getBaseX() + (actor.getLocalLocation().getX() / 32 - 2) / 4;
-        int actorY = methods.client.getBaseY() + (actor.getLocalLocation().getY() / 32 - 2) / 4;
-        return methods.calc.worldToMinimap(actorX, actorY);
+        int actorX = ctx.client.getBaseX() + (actor.getLocalLocation().getX() / 32 - 2) / 4;
+        int actorY = ctx.client.getBaseY() + (actor.getLocalLocation().getY() / 32 - 2) / 4;
+        return ctx.calc.worldToMinimap(actorX, actorY);
     }
 
     public String getName() {
@@ -181,7 +184,7 @@ public abstract class RSCharacter extends MethodProvider implements Clickable07,
         Actor actor = getAccessor();
         RSModel model = getModel();
         if (model == null) {
-            return methods.calc.groundToScreen(
+            return ctx.calc.groundToScreen(
                     actor.getLocalLocation().getX(),
                     actor.getLocalLocation().getY(),
                     actor.getLogicalHeight() / 2);
@@ -191,7 +194,7 @@ public abstract class RSCharacter extends MethodProvider implements Clickable07,
     }
 
     public boolean isBeingAttacked() {
-        if (methods.game.isLoggedIn()) {
+        if (ctx.game.isLoggedIn()) {
             if (getAccessor().getInteracting() != null) {
                 return getAccessor().getHealthRatio() > 0;
             }
@@ -200,7 +203,7 @@ public abstract class RSCharacter extends MethodProvider implements Clickable07,
     }
 
     public boolean isAttacking() {
-        if (methods.game.isLoggedIn()) {
+        if (ctx.game.isLoggedIn()) {
             if (getAccessor().getInteracting() != null) {
                 return getAccessor().getInteracting().getHealthRatio() > 0;
             }
@@ -214,7 +217,7 @@ public abstract class RSCharacter extends MethodProvider implements Clickable07,
     }
 
     public boolean isInteractingWithLocalPlayer() {
-        Player localPlayer = methods.client.getLocalPlayer();
+        Player localPlayer = ctx.client.getLocalPlayer();
         if (localPlayer == null) return false;
         return getAccessor() == localPlayer.getInteracting();
     }
@@ -233,9 +236,9 @@ public abstract class RSCharacter extends MethodProvider implements Clickable07,
     public boolean isOnScreen() {
         RSModel model = getModel();
         if (model == null) {
-            return methods.calc.tileOnScreen(getLocation());
+            return ctx.calc.tileOnScreen(getLocation());
         } else {
-            return methods.calc.pointOnScreen(model.getPoint());
+            return ctx.calc.pointOnScreen(model.getPoint());
         }
     }
 
@@ -275,7 +278,7 @@ public abstract class RSCharacter extends MethodProvider implements Clickable07,
      */
     public boolean turnTo() {
         if (!this.isOnScreen()) {
-            methods.camera.turnTo(this);
+            ctx.camera.turnTo(this);
             return this.isOnScreen();
         }
         return false;
@@ -313,7 +316,7 @@ public abstract class RSCharacter extends MethodProvider implements Clickable07,
     }
 
     public DIRECTION getDirectionFacing() {
-        int angle = this.getAccessor().getOrientation();
+        int angle = getAccessor().getOrientation();
         {
             int round = angle >>> 9;
             int up = angle & 128;

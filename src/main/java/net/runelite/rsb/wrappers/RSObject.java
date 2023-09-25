@@ -1,23 +1,19 @@
 package net.runelite.rsb.wrappers;
 
-import com.google.inject.Provider;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
-import net.runelite.api.*;
 import net.runelite.api.Point;
+import net.runelite.api.*;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.cache.definitions.ObjectDefinition;
-import net.runelite.client.callback.ClientThread;
 import net.runelite.rsb.methods.MethodContext;
 import net.runelite.rsb.methods.MethodProvider;
 import net.runelite.rsb.wrappers.common.CacheProvider;
 import net.runelite.rsb.wrappers.common.ClickBox;
 import net.runelite.rsb.wrappers.common.Clickable07;
 import net.runelite.rsb.wrappers.common.Positionable;
-import net.runelite.rsb.wrappers.RSTile;
 
 import java.awt.*;
-import java.lang.reflect.Field;
 
 /**
  * A wrapper for a tile object which interprets the underlying tile objects type and furthermore
@@ -28,32 +24,35 @@ import java.lang.reflect.Field;
 @Slf4j
 public class RSObject extends MethodProvider implements Clickable07, Positionable, CacheProvider<ObjectDefinition> {
 
-	private final TileObject obj;
-	private final Type type;
-	private final int plane;
-	private final ObjectDefinition def;
-	private final int id;
+    private final TileObject obj;
+    private final Type type;
+    private final int plane;
+    private final ObjectDefinition def;
+    private final int id;
 
-	private final ClickBox clickBox = new ClickBox(this);
+    private final ClickBox clickBox;
+    private final MethodContext ctx;
 
-	/**
-	 * Creates a new RSObject with the following parameters:
-	 *
-	 * @param ctx   The context in which the object exists (the singleton RuneLite)
-	 * @param obj   The TileObject which this RSObject is associated with
-	 * @param type  The type of game object corresponding to the enumerated {@link Type types}
-	 * @param plane The plane that this object exists on
-	 */
-	public RSObject(final MethodContext ctx,
-					final TileObject obj, final Type type,
-					final int plane) {
-		super(ctx);
-		this.obj = obj;
-		this.type = type;
-		this.plane = plane;
-		this.id = (obj != null) ? obj.getId() : -1;
-		this.def = (id != -1) ? (ObjectDefinition) createDefinition(id) : null;
-	}
+    /**
+     * Creates a new RSObject with the following parameters:
+     *
+     * @param ctx   The context in which the object exists (the singleton RuneLite)
+     * @param obj   The TileObject which this RSObject is associated with
+     * @param type  The type of game object corresponding to the enumerated {@link Type types}
+     * @param plane The plane that this object exists on
+     */
+    public RSObject(final MethodContext ctx,
+                    final TileObject obj, final Type type,
+                    final int plane) {
+        super(ctx);
+        this.ctx = ctx;
+        this.clickBox = new ClickBox(this.ctx, this);
+        this.obj = obj;
+        this.type = type;
+        this.plane = plane;
+        this.id = (obj != null) ? obj.getId() : -1;
+        this.def = (id != -1) ? (ObjectDefinition) createDefinition(id) : null;
+    }
 
 	/**
 	 * Gets the RSTile on which this object is centered. An RSObject may cover

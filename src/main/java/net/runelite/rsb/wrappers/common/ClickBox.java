@@ -3,19 +3,21 @@ package net.runelite.rsb.wrappers.common;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Point;
 import net.runelite.rsb.event.listener.PaintListener;
+import net.runelite.rsb.methods.MethodContext;
 import net.runelite.rsb.util.StdRandom;
 
 import java.awt.*;
 import java.awt.geom.PathIterator;
 
-import static net.runelite.rsb.methods.MethodProvider.methods;
 @Slf4j
 public class ClickBox implements Clickable07, PaintListener {
     Clickable07 clickable;
     Shape shape;
     long lastShapeUpdate = 0;
+    final MethodContext ctx;
 
-    public ClickBox(Clickable07 clickable) {
+    public ClickBox(MethodContext ctx, Clickable07 clickable) {
+        this.ctx = ctx;
         this.clickable = clickable;
     }
 
@@ -27,10 +29,10 @@ public class ClickBox implements Clickable07, PaintListener {
     @Override
     public boolean doAction(String action, String option) {
         for (int i = 0; i < 3; i++) {
-            if (!contains(methods.mouse.getLocation())) {
+            if (!contains(ctx.mouse.getLocation())) {
                 doHover();
             }
-            if (methods.menu.doAction(action, option)) {
+            if (ctx.menu.doAction(action, option)) {
                 return true;
             }
         }
@@ -45,11 +47,11 @@ public class ClickBox implements Clickable07, PaintListener {
     @Override
     public boolean doClick(boolean leftClick) {
         for (int i = 0; i < 3; i++) {
-            if (!contains(methods.mouse.getLocation())) {
+            if (!contains(ctx.mouse.getLocation())) {
                 doHover();
             }
-            if (contains(methods.mouse.getLocation())) {
-                methods.mouse.click(leftClick);
+            if (contains(ctx.mouse.getLocation())) {
+                ctx.mouse.click(leftClick);
                 return true;
             }
         }
@@ -61,10 +63,10 @@ public class ClickBox implements Clickable07, PaintListener {
         Point point = getRandomPoint();
         if (point != null && isClickable()) {
             for (int i = 0; i < 3; i++) {
-                if (!contains(methods.mouse.getLocation())) {
-                    methods.mouse.move(point);
+                if (!contains(ctx.mouse.getLocation())) {
+                    ctx.mouse.move(point);
                 }
-                if (contains(methods.mouse.getLocation())) {
+                if (contains(ctx.mouse.getLocation())) {
                     return true;
                 }
             }
