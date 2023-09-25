@@ -6,7 +6,6 @@ import net.runelite.api.Tile;
 import net.runelite.api.coords.LocalPoint;
 import net.runelite.api.coords.WorldPoint;
 import net.runelite.rsb.methods.MethodContext;
-import net.runelite.rsb.methods.Web;
 import net.runelite.rsb.wrappers.common.ClickBox;
 import net.runelite.rsb.wrappers.common.Clickable07;
 import net.runelite.rsb.wrappers.common.Positionable;
@@ -31,7 +30,7 @@ public class RSTile implements Clickable07, Positionable {
     private final ClickBox clickBox;
 
     public enum TYPES {
-        ANIMABLE, LOCAL, WORLD, SCENE;
+        ANIMABLE, LOCAL, WORLD, SCENE
     }
 
     /**
@@ -39,48 +38,52 @@ public class RSTile implements Clickable07, Positionable {
      *
      * @param tile The RuneScape tile to assign coordinates from
      */
-    public RSTile(Tile tile) {
+    public RSTile(MethodContext ctx, Tile tile) {
         this.x = tile.getWorldLocation().getX();
         this.y = tile.getWorldLocation().getY();
         this.plane = tile.getWorldLocation().getPlane();
-        this.ctx = Web.methods;
+        this.ctx = ctx;
         this.clickBox = new ClickBox(this.ctx, this);
         type = TYPES.WORLD;
     }
 
     /**
      * Creates a RSTile object based on the following x and y associated with a particular plane
+     *
      * @param x     the x value unassigned to any particular plane
      * @param y     the y value unassigned to any particular plane
      * @param plane the plane (game-level) for this particular tile
      */
-    public RSTile(int x, int y, int plane) {
+    public RSTile(MethodContext ctx, int x, int y, int plane) {
         this.x = x;
         this.y = y;
         this.plane = plane;
-        this.ctx = Web.methods;
+        this.ctx = ctx;
         this.clickBox = new ClickBox(this.ctx, this);
         this.type = TYPES.WORLD;
     }
 
     /**
      * Creates a RSTile object based on the following x and y unassigned to a plane
+     *
+     * @param x the x value unassigned to any particular plane
+     * @param y the y value unassigned to any particular plane
      * @deprecated Should not be used. Planes are vital to determining game level
-     * @param x     the x value unassigned to any particular plane
-     * @param y     the y value unassigned to any particular plane
      */
     @Deprecated
-    public RSTile(int x, int y) {
+    public RSTile(MethodContext ctx, int x, int y) {
         this.x = x;
         this.y = y;
-        this.ctx = Web.methods;
+        this.ctx = ctx;
         this.clickBox = new ClickBox(this.ctx, this);
 
         //Creates a debug for later development to fix instances in the API where this occurs
         String debugMsg =
-                "\n This exception is thrown when the plane is not set when creating a new tile. It isn't necessarily an issue." +
-                        "\n However,it is useful for fixing potential issues within the API. If the exception is thrown within the API report " +
-                        "\n this exception.";
+                """
+
+                        This exception is thrown when the plane is not set when creating a new tile. It isn't necessarily an issue.
+                        However,it is useful for fixing potential issues within the API. If the exception is thrown within the API report\s
+                        this exception.""".indent(1);
         NoPlaneException exception = new NoPlaneException("No Plane Set. Defaulting to -99.");
         try {
             this.plane = NO_PLANE_SET;
@@ -94,34 +97,35 @@ public class RSTile implements Clickable07, Positionable {
      * Creates an RSTile using the coordinates from the passed WorldPoint
      * This is not the same as a LocalPoint and local values will cause issues if attempted to be constructed
      * as a RSTile in this manner.
-     * @param worldPoint    a point object containing World relevant data such as x, y, and plane.
+     *
+     * @param worldPoint a point object containing World relevant data such as x, y, and plane.
      */
-    public RSTile(WorldPoint worldPoint) {
+    public RSTile(MethodContext ctx, WorldPoint worldPoint) {
         this.x = worldPoint.getX();
         this.y = worldPoint.getY();
         this.plane = worldPoint.getPlane();
-        this.ctx = Web.methods;
+        this.ctx = ctx;
         this.clickBox = new ClickBox(this.ctx, this);
         type = TYPES.WORLD;
     }
 
-    public RSTile(int x, int y, int plane, TYPES type) {
-        this(x,y, plane);
-        this.ctx = Web.methods;
+    public RSTile(MethodContext ctx, int x, int y, int plane, TYPES type) {
+        this(ctx, x, y, plane);
+        this.ctx = ctx;
         this.type = type;
     }
 
-    public RSTile(int x, int y, TYPES type) {
-        this(x, y);
-        this.ctx = Web.methods;
+    public RSTile(MethodContext ctx, int x, int y, TYPES type) {
+        this(ctx, x, y);
+        this.ctx = ctx;
         this.type = type;
     }
 
-    public RSTile(RSTile tile) {
-        this(tile.getX(), tile.getY(), Web.methods.client.getPlane());
-        this.ctx = Web.methods;
+    public RSTile(MethodContext ctx, RSTile tile) {
+        this(ctx, tile.getX(), tile.getY(), ctx.client.getPlane());
+        this.ctx = ctx;
         type = tile.type;
-    };
+    }
 
     public LocalPoint getLocalLocation(MethodContext ctx) {
         return this.getTile(ctx).getLocalLocation();
@@ -151,7 +155,9 @@ public class RSTile implements Clickable07, Positionable {
         WorldPoint worldPoint = new WorldPoint(x, y, plane);
         if (worldPoint.isInScene(ctx.client)) {
             LocalPoint localPoint = LocalPoint.fromWorld(ctx.client, worldPoint);
-            return ctx.client.getScene().getTiles()[worldPoint.getPlane()][localPoint.getSceneX()][localPoint.getSceneY()];
+            if (localPoint != null) {
+                return ctx.client.getScene().getTiles()[worldPoint.getPlane()][localPoint.getSceneX()][localPoint.getSceneY()];
+            }
         }
         return null;
     }
@@ -175,7 +181,7 @@ public class RSTile implements Clickable07, Positionable {
             d *= maxYDeviation;
             y += (int) d;
         }
-        return new RSTile(x, y);
+        return new RSTile(ctx, x, y);
     }
 
     @Override
@@ -183,8 +189,7 @@ public class RSTile implements Clickable07, Positionable {
         if (obj == this) {
             return true;
         }
-        if (obj instanceof RSTile) {
-            final RSTile tile = (RSTile) obj;
+        if (obj instanceof final RSTile tile) {
             return (tile.x == x) && (tile.y == y) && ((tile.plane != NO_PLANE_SET && this.plane != NO_PLANE_SET) && (tile.plane == plane));
         }
         return false;
@@ -196,7 +201,7 @@ public class RSTile implements Clickable07, Positionable {
     }
 
 
-    class NoPlaneException extends Exception {
+    static class NoPlaneException extends Exception {
         NoPlaneException(String message) {
             super(message);
         }
@@ -204,7 +209,7 @@ public class RSTile implements Clickable07, Positionable {
 
     @Override
     public RSTile getLocation() {
-        return new RSTile(this);
+        return new RSTile(ctx, this);
     }
 
 
@@ -267,7 +272,7 @@ public class RSTile implements Clickable07, Positionable {
     }
 
     public RSTile toWorldTile() {
-        RSTile tile = new RSTile(this);
+        RSTile tile = new RSTile(ctx, this);
         if (tile.type == TYPES.LOCAL) {
             WorldPoint point = WorldPoint.fromLocal(ctx.client, new LocalPoint(x, y));
             tile.x = point.getX();
@@ -285,7 +290,7 @@ public class RSTile implements Clickable07, Positionable {
     }
 
     public RSTile toLocalTile() {
-        RSTile tile = new RSTile(this);
+        RSTile tile = new RSTile(ctx, this);
         if (tile.type == TYPES.WORLD) {
             int baseX = ctx.client.getBaseX();
             int baseY = ctx.client.getBaseY();
@@ -302,7 +307,7 @@ public class RSTile implements Clickable07, Positionable {
     }
 
     public RSTile toSceneTile() {
-        RSTile tile = new RSTile(this);
+        RSTile tile = new RSTile(ctx, this);
         if (tile.type != TYPES.SCENE) {
             if (tile.type == TYPES.WORLD) {
                 tile.toLocalTile();
@@ -384,7 +389,7 @@ public class RSTile implements Clickable07, Positionable {
      * @return
      */
     public RSTile offset(int x, int y) {
-        return new RSTile(this.x + x, this.y + y, this.plane);
+        return new RSTile(ctx, this.x + x, this.y + y, this.plane);
     }
 
     /**
@@ -395,7 +400,7 @@ public class RSTile implements Clickable07, Positionable {
      * @return
      */
     public RSTile offset(int x, int y, int plane) {
-        return new RSTile(this.x + x, this.y + y, this.plane + plane);
+        return new RSTile(ctx, this.x + x, this.y + y, this.plane + plane);
     }
 
     /**
@@ -404,7 +409,7 @@ public class RSTile implements Clickable07, Positionable {
      * @return
      */
     public RSTile offset(RSTile tile) {
-        return new RSTile(this.x + tile.x, this.y + tile.y, this.plane + tile.plane);
+        return new RSTile(ctx, this.x + tile.x, this.y + tile.y, this.plane + tile.plane);
     }
 
     public int getWorldX() {

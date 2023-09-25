@@ -1,6 +1,5 @@
 package net.runelite.rsb.wrappers.subwrap;
 
-import net.runelite.api.coords.WorldArea;
 import net.runelite.rsb.methods.MethodContext;
 import net.runelite.rsb.methods.MethodProvider;
 import net.runelite.rsb.wrappers.RSLocalPath;
@@ -9,7 +8,6 @@ import net.runelite.rsb.wrappers.RSTile;
 import net.runelite.rsb.wrappers.common.Positionable;
 import org.apache.commons.lang3.tuple.Pair;
 
-import javax.swing.text.Position;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -18,6 +16,7 @@ import java.util.function.Predicate;
 
 public class NPCPath extends MethodProvider {
     public RSNPC[] npcs;
+    private static MethodContext ctx = null;
     static final Map<Pair<Integer, Integer>, Integer> toDirectionMap = Map.of(
             Pair.of(0, 1), RSLocalPath.WALL_NORTH,
             Pair.of(0, -1), RSLocalPath.WALL_SOUTH,
@@ -40,8 +39,9 @@ public class NPCPath extends MethodProvider {
     static final int horizontalDirections = RSLocalPath.WALL_EAST | RSLocalPath.WALL_WEST;
     static final int verticalDirections = RSLocalPath.WALL_NORTH | RSLocalPath.WALL_SOUTH;
 
-    public NPCPath(MethodContext ctx, RSNPC... npcs) {
-        super(ctx);
+    public NPCPath(MethodContext ctxx, RSNPC... npcs) {
+        super(ctxx);
+        ctx = ctxx;
         this.npcs = npcs;
     }
 
@@ -54,30 +54,40 @@ public class NPCPath extends MethodProvider {
         return getNearestSafespot(end, limit, (x) -> Arrays.stream(npcs).anyMatch((npc) -> npc.hasLineOfSight(x) && x.distanceTo(npc) <= weaponRange));
     }
 
-    public RSTile getNearestSafespot(Positionable end, int limit, Predicate<RSTile> predicate){
-        int[][] flags = methods.client.getCollisionMaps()[methods.game.getPlane()].getFlags();
+    public static int[][] getCollisionFlags() {
+        if (ctx.client.getCollisionMaps() != null) {
+            return ctx.client.getCollisionMaps()[ctx.game.getPlane()].getFlags();
+        }
+        return null;
+    }
+
+    public RSTile getNearestSafespot(Positionable end, int limit, Predicate<RSTile> predicate) {
+        int[][] flags = getCollisionFlags();
+        if (flags == null) {
+            return null;
+        }
         RSTile center = end.getLocation();
         int i = center.getX(), j = center.getY();
         // Snake iterator; iterates from center outward in concentric squares
-        RSTile current = new RSTile(i , j, center.getPlane());
+        RSTile current = new RSTile(ctx, i, j, center.getPlane());
         if (isSafeSpotted(current) && predicate.test(current)) return current;
         for (int layer = 1; layer <= limit; layer++, j--, i--) {
             while (i < center.getX() + layer)
-                if (isSafeSpotted(current = new RSTile(++i , j, center.getPlane())) && predicate.test(current) &&
-                    ((flags[current.getSceneX()][current.getSceneY()] & RSLocalPath.BLOCKED) == 0))
-                        return current;
+                if (isSafeSpotted(current = new RSTile(ctx, ++i, j, center.getPlane())) && predicate.test(current) &&
+                        ((flags[current.getSceneX()][current.getSceneY()] & RSLocalPath.BLOCKED) == 0))
+                    return current;
             while (j < center.getY() + layer)
-                if (isSafeSpotted(current = new RSTile(i , ++j, center.getPlane())) && predicate.test(current) &&
-                    ((flags[current.getSceneX()][current.getSceneY()] & RSLocalPath.BLOCKED) == 0))
-                        return current;
+                if (isSafeSpotted(current = new RSTile(ctx, i, ++j, center.getPlane())) && predicate.test(current) &&
+                        ((flags[current.getSceneX()][current.getSceneY()] & RSLocalPath.BLOCKED) == 0))
+                    return current;
             while (i > center.getX() - layer)
-                if (isSafeSpotted(current = new RSTile(--i , j, center.getPlane())) && predicate.test(current) &&
-                    ((flags[current.getSceneX()][current.getSceneY()] & RSLocalPath.BLOCKED) == 0))
-                        return current;
+                if (isSafeSpotted(current = new RSTile(ctx, --i, j, center.getPlane())) && predicate.test(current) &&
+                        ((flags[current.getSceneX()][current.getSceneY()] & RSLocalPath.BLOCKED) == 0))
+                    return current;
             while (j > center.getY() - layer)
-                if (isSafeSpotted(current = new RSTile(i , --j, center.getPlane())) && predicate.test(current) &&
-                    ((flags[current.getSceneX()][current.getSceneY()] & RSLocalPath.BLOCKED) == 0))
-                        return current;
+                if (isSafeSpotted(current = new RSTile(ctx, i, --j, center.getPlane())) && predicate.test(current) &&
+                        ((flags[current.getSceneX()][current.getSceneY()] & RSLocalPath.BLOCKED) == 0))
+                    return current;
         }
         return null;
     }
@@ -99,10 +109,12 @@ public class NPCPath extends MethodProvider {
     static public RSTile[] getPath(RSNPC npc, RSTile start, RSTile end) {
         List<RSTile> returnList = new ArrayList<>();
         returnList.add(start);
-        while (start.getX() != end.getX() || start.getY() != end.getY()) {
-            start = getNextTile(npc, start , end);
-            if (start.getWorldLocation().getX() == -1) {
-                break;
+        while (start != null && (start.getX() != end.getX() || start.getY() != end.getY())) {
+            start = getNextTile(npc, start, end);
+            if (start != null) {
+                if (start.getWorldLocation().getX() == -1) {
+                    break;
+                }
             }
             returnList.add(start);
         }
@@ -115,8 +127,11 @@ public class NPCPath extends MethodProvider {
 
 
     static public RSTile getNextTile(RSNPC npc, RSTile start, RSTile end) {
-        WorldArea area = npc.getAccessor().getWorldArea();
-        int[][] flags = methods.client.getCollisionMaps()[methods.game.getPlane()].getFlags();
+        //WorldArea area = npc.getAccessor().getWorldArea();
+        int[][] flags = getCollisionFlags();
+        if (flags == null) {
+            return null;
+        }
 
         // directionMask is all possible directions NPC wants to move
         int directionMask = toDirectionMap.get(Pair.of(
@@ -153,7 +168,7 @@ public class NPCPath extends MethodProvider {
             directionMask = directionMask & verticalDirections;
         }
         else {
-            return new RSTile(-1, -1, -1);
+            return new RSTile(ctx, -1, -1, -1);
         }
 
         // return a new tile from directionMask

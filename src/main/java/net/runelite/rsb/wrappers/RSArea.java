@@ -1,6 +1,7 @@
 package net.runelite.rsb.wrappers;
 
 import net.runelite.api.coords.WorldPoint;
+import net.runelite.rsb.methods.MethodContext;
 import net.runelite.rsb.wrappers.common.Positionable;
 
 import java.awt.*;
@@ -12,91 +13,94 @@ import java.util.ArrayList;
  * @author GigiaJ
  */
 public class RSArea {
-	private final TileArea area;
-	private final int plane;
+    private final TileArea area;
+    private final int plane;
+    private final MethodContext ctx;
 
-	/**
-	 * @param tiles An Array containing of <b>RSTiles</b> forming a polygon shape.
-	 * @param plane The plane of the <b>RSArea</b>.
-	 */
-	public RSArea(RSTile[] tiles, int plane) {
-		this.area = tileArrayToPolygon(tiles);
-		this.plane = plane;
-	}
+    /**
+     * @param tiles An Array containing of <b>RSTiles</b> forming a polygon shape.
+     * @param plane The plane of the <b>RSArea</b>.
+     */
+    public RSArea(MethodContext ctx, RSTile[] tiles, int plane) {
+        this.ctx = ctx;
+        this.area = tileArrayToPolygon(tiles);
+        this.plane = plane;
+    }
 
-	/**
-	 * @param tiles An Array containing of <b>RSTiles</b> forming a polygon shape.
-	 */
-	public RSArea(RSTile[] tiles) {
-		this(tiles, 0);
-	}
+    /**
+     * @param tiles An Array containing of <b>RSTiles</b> forming a polygon shape.
+     */
+    public RSArea(MethodContext ctx, RSTile[] tiles) {
+        this(ctx, tiles, 0);
+    }
 
-	/**
-	 * @param sw    The <i>South West</i> <b>RSTile</b> of the <b>RSArea</b>
-	 * @param ne    The <i>North East</i> <b>RSTile</b> of the <b>RSArea</b>
-	 * @param plane The plane of the <b>RSArea</b>.
-	 */
-	public RSArea(RSTile sw, RSTile ne, int plane) {
-		this(new RSTile[]{sw, new RSTile(ne.getWorldLocation().getX() + 1, sw.getWorldLocation().getY(), plane),
-				new RSTile(ne.getWorldLocation().getX() + 1, ne.getWorldLocation().getY() + 1, plane),
-				new RSTile(sw.getWorldLocation().getX(), ne.getWorldLocation().getY() + 1, plane)}, plane);
-	}
+    /**
+     * @param sw    The <i>South West</i> <b>RSTile</b> of the <b>RSArea</b>
+     * @param ne    The <i>North East</i> <b>RSTile</b> of the <b>RSArea</b>
+     * @param plane The plane of the <b>RSArea</b>.
+     */
+    public RSArea(MethodContext ctx, RSTile sw, RSTile ne, int plane) {
+        this(ctx, new RSTile[]{sw, new RSTile(ctx, ne.getWorldLocation().getX() + 1, sw.getWorldLocation().getY(), plane),
+                new RSTile(ctx, ne.getWorldLocation().getX() + 1, ne.getWorldLocation().getY() + 1, plane),
+                new RSTile(ctx, sw.getWorldLocation().getX(), ne.getWorldLocation().getY() + 1, plane)}, plane);
+    }
 
-	/**
-	 * @param sw The <i>South West</i> <b>RSTile</b> of the <b>RSArea</b>
-	 * @param ne The <i>North East</i> <b>RSTile</b> of the <b>RSArea</b>
-	 */
-	public RSArea(RSTile sw, RSTile ne) {
-		this(sw, ne, 0);
-	}
+    /**
+     * @param sw The <i>South West</i> <b>RSTile</b> of the <b>RSArea</b>
+     * @param ne The <i>North East</i> <b>RSTile</b> of the <b>RSArea</b>
+     */
+    public RSArea(MethodContext ctx, RSTile sw, RSTile ne) {
+        this(ctx, sw, ne, 0);
+    }
 
-	/**
-	 * @param swX The X axle of the <i>South West</i> <b>RSTile</b> of the
-	 *            <b>RSArea</b>
-	 * @param swY The Y axle of the <i>South West</i> <b>RSTile</b> of the
-	 *            <b>RSArea</b>
-	 * @param neX The X axle of the <i>North East</i> <b>RSTile</b> of the
-	 *            <b>RSArea</b>
-	 * @param neY The Y axle of the <i>North East</i> <b>RSTile</b> of the
-	 *            <b>RSArea</b>
-	 */
-	public RSArea(int swX, int swY, int neX, int neY) {
-		this(new RSTile(swX, swY), new RSTile(neX, neY), 0);
-	}
+    /**
+     * @param swX The X axle of the <i>South West</i> <b>RSTile</b> of the
+     *            <b>RSArea</b>
+     * @param swY The Y axle of the <i>South West</i> <b>RSTile</b> of the
+     *            <b>RSArea</b>
+     * @param neX The X axle of the <i>North East</i> <b>RSTile</b> of the
+     *            <b>RSArea</b>
+     * @param neY The Y axle of the <i>North East</i> <b>RSTile</b> of the
+     *            <b>RSArea</b>
+     */
+    public RSArea(MethodContext ctx, int swX, int swY, int neX, int neY) {
+        this(ctx, new RSTile(ctx, swX, swY), new RSTile(ctx, neX, neY), 0);
+    }
 
-	/**
-	 * @param swX The X axle of the <i>South West</i> <b>RSTile</b> of the
-	 *            <b>RSArea</b>
-	 * @param swY The Y axle of the <i>South West</i> <b>RSTile</b> of the
-	 *            <b>RSArea</b>
-	 * @param neX The X axle of the <i>North East</i> <b>RSTile</b> of the
-	 *            <b>RSArea</b>
-	 * @param neY The Y axle of the <i>North East</i> <b>RSTile</b> of the
-	 *            <b>RSArea</b>
-	 * @param p The plane of the <b>RSArea</b>
-	 */
-	public RSArea(int swX, int swY, int neX, int neY, int p) {
-		this(new RSTile(swX, swY), new RSTile(neX, neY), p);
-	}
+    /**
+     * @param swX The X axle of the <i>South West</i> <b>RSTile</b> of the
+     *            <b>RSArea</b>
+     * @param swY The Y axle of the <i>South West</i> <b>RSTile</b> of the
+     *            <b>RSArea</b>
+     * @param neX The X axle of the <i>North East</i> <b>RSTile</b> of the
+     *            <b>RSArea</b>
+     * @param neY The Y axle of the <i>North East</i> <b>RSTile</b> of the
+     *            <b>RSArea</b>
+     * @param p   The plane of the <b>RSArea</b>
+     */
+    public RSArea(MethodContext ctx, int swX, int swY, int neX, int neY, int p) {
+        this(ctx, new RSTile(ctx, swX, swY), new RSTile(ctx, neX, neY), p);
+    }
 
-	/**
-	 * Creates an area with the given tile as the center and the sides being the given radius from the center tile
-	 *
-	 * @param positionable The tile to be the center of the area
-	 * @param radius The radius of the area
-	 */
-	public RSArea(Positionable positionable, int radius) {
-		this.plane = positionable.getLocation().getWorldLocation().getPlane();
-		TileArea tileArea = new TileArea();
-		tileArea.addPoint(positionable.getLocation().getWorldLocation().getX() - radius, positionable.getLocation().getWorldLocation().getY() + radius);
-		tileArea.addPoint(positionable.getLocation().getWorldLocation().getX() + radius, positionable.getLocation().getWorldLocation().getY() + radius);
-		tileArea.addPoint(positionable.getLocation().getWorldLocation().getX() + radius, positionable.getLocation().getWorldLocation().getY() - radius);
-		tileArea.addPoint(positionable.getLocation().getWorldLocation().getX() - radius, positionable.getLocation().getWorldLocation().getY() - radius);
-		area = tileArea;
+    /**
+     * Creates an area with the given tile as the center and the sides being the given radius from the center tile
+     *
+     * @param positionable The tile to be the center of the area
+     * @param radius       The radius of the area
+     */
+    public RSArea(MethodContext ctx, Positionable positionable, int radius) {
+        this.ctx = ctx;
+        this.plane = positionable.getLocation().getWorldLocation().getPlane();
+        TileArea tileArea = new TileArea();
+        tileArea.addPoint(positionable.getLocation().getWorldLocation().getX() - radius, positionable.getLocation().getWorldLocation().getY() + radius);
+        tileArea.addPoint(positionable.getLocation().getWorldLocation().getX() + radius, positionable.getLocation().getWorldLocation().getY() + radius);
+        tileArea.addPoint(positionable.getLocation().getWorldLocation().getX() + radius, positionable.getLocation().getWorldLocation().getY() - radius);
+        tileArea.addPoint(positionable.getLocation().getWorldLocation().getX() - radius, positionable.getLocation().getWorldLocation().getY() - radius);
+        area = tileArea;
 	}
 
     public boolean contains(WorldPoint point) {
-		return this.contains(new RSTile(point));
+		return this.contains(new RSTile(ctx, point));
 	}
 
 	/**
@@ -105,7 +109,7 @@ public class RSArea {
 	 * @return True if the <b>RSArea</b> contains the given <b>RSTile</b>.
 	 */
 	public boolean contains(int x, int y) {
-		return this.contains(new RSTile(x, y));
+		return this.contains(new RSTile(ctx, x, y));
 	}
 
 	/**
@@ -141,11 +145,11 @@ public class RSArea {
 			return null;
 		}
 		int totalX = 0, totalY = 0;
-		for (int i = 0; i < area.npoints; i++) {
-			totalX += area.xpoints[i];
-			totalY += area.ypoints[i];
+        for (int i = 0; i < area.npoints; i++) {
+            totalX += area.xpoints[i];
+            totalY += area.ypoints[i];
 		}
-		return new RSTile(Math.round(totalX / area.npoints),
+		return new RSTile(ctx, Math.round(totalX / area.npoints),
 				Math.round(totalY / area.npoints));
 	}
 
@@ -179,7 +183,7 @@ public class RSArea {
 		for (int x = this.getX(); x <= (this.getX() + this.getWidth()); x++) {
 			for (int y = this.getY(); y <= (this.getY() + this.getHeight()); y++) {
 				if (this.area.contains(new Point(x, y))) {
-					list.add(new RSTile(x, y, plane));
+					list.add(new RSTile(ctx, x, y, plane));
 				}
 			}
 		}
@@ -197,8 +201,8 @@ public class RSArea {
 		RSTile[][] tiles = new RSTile[this.getWidth()][this.getHeight()];
 		for (int i = 0; i < this.getWidth(); ++i) {
 			for (int j = 0; j < this.getHeight(); ++j) {
-				if (this.area.contains(new Point(this.getX() + i, this.getY() + j))) {
-					tiles[i][j] = new RSTile(this.getX() + i, this.getY() + j);
+                if (this.area.contains(new Point(this.getX() + i, this.getY() + j))) {
+					tiles[i][j] = new RSTile(ctx, this.getX() + i, this.getY() + j);
 				}
 			}
 		}
@@ -291,14 +295,12 @@ public class RSArea {
 			super();
 		}
 
-		@Override
-		public void addPoint(int x, int y) {
-			super.addPoint(x, y);
-			Point[] previousPoints = points;
-			points = new Point[previousPoints.length+1];
-			for (int i = 0; i < previousPoints.length; i++) {
-				points[i] = previousPoints[i];
-			}
+        @Override
+        public void addPoint(int x, int y) {
+            super.addPoint(x, y);
+            Point[] previousPoints = points;
+            points = new Point[previousPoints.length + 1];
+            System.arraycopy(previousPoints, 0, points, 0, previousPoints.length);
 			points[previousPoints.length] = new Point(x, y);
 		}
 

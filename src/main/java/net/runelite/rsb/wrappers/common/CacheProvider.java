@@ -32,10 +32,11 @@ public interface CacheProvider<T> {
 
     private static void fillCacheFromDirectory(File dir, String className) {
         File[] directoryListing = dir.listFiles();
-
-        for (File file : directoryListing) {
-            if (file.getName().contains(".json")) {
-                fileCache.put(Integer.parseInt(file.getName().replace(".json", "")) + className, file);
+        if (directoryListing != null) {
+            for (File file : directoryListing) {
+                if (file.getName().contains(".json")) {
+                    fileCache.put(Integer.parseInt(file.getName().replace(".json", "")) + className, file);
+                }
             }
         }
     }

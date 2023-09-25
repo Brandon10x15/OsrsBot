@@ -85,8 +85,8 @@ public abstract class RSCharacter extends MethodProvider implements Clickable07,
                 if (ctx.client.getLocalPlayer() != null)
                     //Attempt to accurately decide which set is which (Hopefully this is never relied on)
                     pathXIndex = (((int[]) pathFields.get(0).get(ctx.client.getLocalPlayer()))[0] == ctx.client.getLocalPlayer().getLocalLocation().getSceneX()) ? 0 : 1;
-            pathYIndex = (pathXIndex == 0) ? 1 : 0;
-        } catch (IllegalAccessException e) {
+                pathYIndex = (pathXIndex == 0) ? 1 : 0;
+            } catch (IllegalAccessException e) {
             log.error("Accessed reflected object incorrectly", e.getCause());
         }
     }
@@ -148,7 +148,7 @@ public abstract class RSCharacter extends MethodProvider implements Clickable07,
     public RSTile getLocation() {
         Actor actor = getAccessor();
         if (actor == null) { return null; }
-        return new RSTile(actor.getWorldLocation());
+        return new RSTile(ctx, actor.getWorldLocation());
     }
 
     public String getMessage() {
@@ -301,10 +301,7 @@ public abstract class RSCharacter extends MethodProvider implements Clickable07,
 
     public boolean isClickable() {
         RSModel model = getModel();
-        if (model == null) {
-            return false;
-        }
-        return true;
+        return model != null;
         //return model.getModel().isClickable();
     }
 
@@ -339,6 +336,6 @@ public abstract class RSCharacter extends MethodProvider implements Clickable07,
     }
 
     public enum DIRECTION {
-        N, S, E, W, NE, NW, SE, SW;
+        N, S, E, W, NE, NW, SE, SW
     }
 }

@@ -167,16 +167,17 @@ public class ClickBox implements Clickable07, PaintListener {
         }
         final double flatness = 0.1;
         PathIterator pi = shape.getPathIterator(null, flatness);
-        double coords[] = new double[6];
+        double[] coords = new double[6];
         double sumX = 0;
         double sumY = 0;
         int numPoints = 0;
         while (!pi.isDone())
         {
             int s = pi.currentSegment(coords);
-            switch (s)
-            {
+            switch (s) {
                 case PathIterator.SEG_MOVETO:
+
+                case PathIterator.SEG_CLOSE:
                     // Ignore
                     break;
 
@@ -184,10 +185,6 @@ public class ClickBox implements Clickable07, PaintListener {
                     sumX += coords[0];
                     sumY += coords[1];
                     numPoints++;
-                    break;
-
-                case PathIterator.SEG_CLOSE:
-                    // Ignore
                     break;
 
                 case PathIterator.SEG_QUADTO:
@@ -255,8 +252,8 @@ public class ClickBox implements Clickable07, PaintListener {
         }
         final double flatness = 0.1;
         PathIterator pi = shape.getPathIterator(null, flatness);
-        double prevCoords[] = new double[6];
-        double coords[] = new double[6];
+        double[] prevCoords = new double[6];
+        double[] coords = new double[6];
         double minDistance = Double.MAX_VALUE;
         while (!pi.isDone()) {
             int s = pi.currentSegment(coords);

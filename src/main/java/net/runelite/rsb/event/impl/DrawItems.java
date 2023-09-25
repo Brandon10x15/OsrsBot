@@ -35,7 +35,7 @@ public class DrawItems implements PaintListener {
 		final int tHeight = metrics.getHeight();
 		for (int x = locX - 25; x < locX + 25; x++) {
 			for (int y = locY - 25; y < locY + 25; y++) {
-				final Point screen = ctx.calc.tileToScreen(new RSTile(x, y, locPlane));
+				final Point screen = ctx.calc.tileToScreen(new RSTile(ctx, x, y, locPlane));
 				if (screen == null || !ctx.calc.pointOnScreen(screen)) {
 					continue;
 				}
@@ -50,8 +50,8 @@ public class DrawItems implements PaintListener {
 					}
 				}
 				for (int i = 0; i < items.length; i++) {
-					render.setColor(Color.RED);
-					render.fillRect((int) screen.getX() - 1, (int) screen.getY() - 1, 2, 2);
+                    render.setColor(Color.RED);
+                    render.fillRect(screen.getX() - 1, screen.getY() - 1, 2, 2);
 					final String s = "" + items[i].getItem().getID();
 					final int ty = screen.getY() - tHeight * (i + 1) + tHeight / 2;
 					final int tx = screen.getX() - metrics.stringWidth(s) / 2;

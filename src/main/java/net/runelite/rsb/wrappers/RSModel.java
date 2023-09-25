@@ -40,9 +40,11 @@ public class RSModel extends MethodProvider {
 	protected int[] indices1;
 	protected int[] indices2;
 	protected int[] indices3;
+    private final MethodContext ctx;
 
 	public RSModel(MethodContext ctx, Model model) {
-		super(ctx);
+        super(ctx);
+        this.ctx = ctx;
 		if (model != null) {
 			this.model = model;
 			xPoints = model.getVerticesX();
@@ -65,7 +67,7 @@ public class RSModel extends MethodProvider {
 	}
 
 	protected int getLocalZ() {
-		return Perspective.getTileHeight(methods.client, new LocalPoint(getLocalX(), getLocalY()), methods.client.getPlane());
+        return Perspective.getTileHeight(ctx.client, new LocalPoint(getLocalX(), getLocalY()), ctx.client.getPlane());
 	}
 
 	protected void update() {
@@ -94,12 +96,12 @@ public class RSModel extends MethodProvider {
 	public boolean doClick(boolean leftClick) {
 		try {
 			for (int i = 0; i < 10; i++) {
-				methods.mouse.move(getPointNearCenter());
-				if (this.contains(methods.mouse.getLocation())) {
-					methods.mouse.click(leftClick);
-					return true;
-				}
-			}
+                ctx.mouse.move(getPointNearCenter());
+                if (this.contains(ctx.mouse.getLocation())) {
+                    ctx.mouse.click(leftClick);
+                    return true;
+                }
+            }
 		} catch (Exception ignored) {
 			log.debug("Model click error", ignored);
 		}
@@ -116,14 +118,14 @@ public class RSModel extends MethodProvider {
 	public boolean doAction(String action, String... target) {
 		try {
 			for (int i = 0; i < 3; i++) {
-				if (!this.contains(methods.mouse.getLocation())) {
-					methods.mouse.move(getPointNearCenter());
-					methods.mouse.move(getPointNearCenter());
-				}
-				if (methods.menu.doAction(action, target)) {
-					return true;
-				}
-			}
+                if (!this.contains(ctx.mouse.getLocation())) {
+                    ctx.mouse.move(getPointNearCenter());
+                    ctx.mouse.move(getPointNearCenter());
+                }
+                if (ctx.menu.doAction(action, target)) {
+                    return true;
+                }
+            }
 		} catch (Exception ignored) {
 			log.debug("Model action perform error", ignored);
 		}
@@ -193,11 +195,11 @@ public class RSModel extends MethodProvider {
 			for (Polygon p : tris) {
 				for (int j = 0; j < p.xpoints.length; j++) {
 					Point firstPoint = new Point(p.xpoints[j], p.ypoints[j]);
-					if (methods.calc.pointOnScreen(firstPoint)) {
-						return firstPoint;
-					} else {
-						list.add(firstPoint);
-					}
+                    if (ctx.calc.pointOnScreen(firstPoint)) {
+                        return firstPoint;
+                    } else {
+                        list.add(firstPoint);
+                    }
 				}
 			}
 		} catch (Exception ignored) {
@@ -214,7 +216,7 @@ public class RSModel extends MethodProvider {
 	public Polygon[] getTriangles() {
 		final int NO_MODEL = 1;
 		if (model == null) {
-			Polygon tilePoly = Perspective.getCanvasTilePoly(methods.client, new LocalPoint(getLocalX(), getLocalY()));
+            Polygon tilePoly = Perspective.getCanvasTilePoly(ctx.client, new LocalPoint(getLocalX(), getLocalY()));
 			return new Polygon[]{tilePoly};
 		}
 		int count = model.getVerticesCount();
@@ -225,7 +227,7 @@ public class RSModel extends MethodProvider {
 		int localX = getLocalX();
 		int localY = getLocalY();
 
-		Perspective.modelToCanvas(methods.client, count, localX, localY, getLocalZ(), getOrientation(), model.getVerticesX(), model.getVerticesZ(), model.getVerticesY(), x2d, y2d);
+        Perspective.modelToCanvas(ctx.client, count, localX, localY, getLocalZ(), getOrientation(), model.getVerticesX(), model.getVerticesZ(), model.getVerticesY(), x2d, y2d);
 		ArrayList<Polygon> polys = new ArrayList<>(model.getFaceCount());
 
 		int[] trianglesX = model.getFaceIndices1();
@@ -260,7 +262,7 @@ public class RSModel extends MethodProvider {
 	 * Moves the mouse onto the RSModel.
 	 */
 	public void hover() {
-		methods.mouse.move(getPointNearCenter());
+        ctx.mouse.move(getPointNearCenter());
 	}
 
 	/**
@@ -345,9 +347,9 @@ public class RSModel extends MethodProvider {
 
 	protected Point getPointInRange(int start, int end) {
 		int locX = getLocalX();
-		int locY = getLocalY();
-		int height = methods.calc.tileHeight(locX, locY);
-		Polygon[] triangles = this.getTriangles();
+        int locY = getLocalY();
+        int height = ctx.calc.tileHeight(locX, locY);
+        Polygon[] triangles = this.getTriangles();
 		ArrayList<Point> points = new ArrayList<>();
 		for (int i = start; i < end && i < triangles.length; i++)
 			for (int n = 0; n < triangles[i].npoints; n++)
@@ -416,7 +418,7 @@ public class RSModel extends MethodProvider {
 		int[] x2d = new int[8];
 		int[] y2d = new int[8];
 
-		Perspective.modelToCanvas(methods.client, 8, getLocalX(), getLocalY(), getLocalZ(), getOrientation(), xa, ya, za, x2d, y2d);
+        Perspective.modelToCanvas(ctx.client, 8, getLocalX(), getLocalY(), getLocalZ(), getOrientation(), xa, ya, za, x2d, y2d);
 		SimplePolygon simplePolygon = Jarvis.convexHull(x2d, y2d);
 		return new Polygon(simplePolygon.getX(), simplePolygon.getY(), simplePolygon.size());
 	}

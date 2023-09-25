@@ -16,10 +16,12 @@ public class RSTilePath extends RSPath {
 	protected RSTile[] orig;
 
 	private boolean end;
+    private final MethodContext ctx;
 
 	public RSTilePath(MethodContext ctx, RSTile[] tiles) {
-		super(ctx);
-		this.orig = tiles;
+        super(ctx);
+        this.ctx = ctx;
+        this.orig = tiles;
 		this.tiles = Arrays.copyOf(tiles, tiles.length);
 	}
 
@@ -31,37 +33,37 @@ public class RSTilePath extends RSPath {
 		if (next == null) {
 			return false;
 		}
-		if (next.equals(getEnd())) {
-			if (methods.calc.distanceTo(next) <= 1 || (end && methods.players.getMyPlayer().isLocalPlayerMoving()) || next.equals(
-					methods.walking.getDestination())) {
-				return false;
-			}
-			end = true;
-		} else {
-			end = false;
-		}
-		if (options != null && options.contains(
-				TraversalOption.HANDLE_RUN) && !methods.walking.isRunEnabled() && methods.walking.getEnergy() > 50) {
-			methods.walking.setRun(true);
-			sleep(300);
-		}
-		if (options != null && options.contains(TraversalOption.SPACE_ACTIONS)) {
-			RSTile dest = methods.walking.getDestination();
-			if (dest != null && methods.players.getMyPlayer().isLocalPlayerMoving() &&
-					methods.calc.distanceTo(dest) > 5 &&
-					methods.calc.distanceBetween(next, dest) < 7) {
-				return true;
-			}
-		}
-		return methods.walking.walkTileMM(next, 0, 0);
+        if (next.equals(getEnd())) {
+            if (ctx.calc.distanceTo(next) <= 1 || (end && ctx.players.getMyPlayer().isLocalPlayerMoving()) || next.equals(
+                    ctx.walking.getDestination())) {
+                return false;
+            }
+            end = true;
+        } else {
+            end = false;
+        }
+        if (options != null && options.contains(
+                TraversalOption.HANDLE_RUN) && !ctx.walking.isRunEnabled() && ctx.walking.getEnergy() > 50) {
+            ctx.walking.setRun(true);
+            sleep(300);
+        }
+        if (options != null && options.contains(TraversalOption.SPACE_ACTIONS)) {
+            RSTile dest = ctx.walking.getDestination();
+            if (dest != null && ctx.players.getMyPlayer().isLocalPlayerMoving() &&
+                    ctx.calc.distanceTo(dest) > 5 &&
+                    ctx.calc.distanceBetween(next, dest) < 7) {
+                return true;
+            }
+        }
+        return ctx.walking.walkTileMM(next, 0, 0);
 	}
 
 	/**
 	 * {@inheritDoc}
 	 */
 	public boolean isValid() {
-		return tiles.length > 0 && getNext() != null &&
-				!methods.players.getMyPlayer().getLocation().equals(getEnd());
+        return tiles.length > 0 && getNext() != null &&
+                !ctx.players.getMyPlayer().getLocation().equals(getEnd());
 	}
 
 	/**
@@ -69,9 +71,9 @@ public class RSTilePath extends RSPath {
 	 */
 	public RSTile getNext() {
 		for (int i = tiles.length - 1; i >= 0; --i) {
-			if (methods.calc.tileOnMap(tiles[i])) {
-				return tiles[i];
-			}
+            if (ctx.calc.tileOnMap(tiles[i])) {
+                return tiles[i];
+            }
 		}
 		return null;
 	}

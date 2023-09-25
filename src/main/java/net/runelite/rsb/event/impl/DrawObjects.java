@@ -1,12 +1,12 @@
 package net.runelite.rsb.event.impl;
 
+import net.runelite.api.Point;
 import net.runelite.rsb.botLauncher.BotLite;
 import net.runelite.rsb.event.listener.PaintListener;
 import net.runelite.rsb.methods.MethodContext;
 import net.runelite.rsb.wrappers.RSObject;
 import net.runelite.rsb.wrappers.RSPlayer;
 import net.runelite.rsb.wrappers.RSTile;
-import net.runelite.api.Point;
 
 import java.awt.*;
 import java.util.HashMap;
@@ -44,8 +44,8 @@ public class DrawObjects implements PaintListener {
 		final int tHeight = metrics.getHeight();
 		for (int x = locX - 25; x < locX + 25; x++) {
 			for (int y = locY - 25; y < locY + 25; y++) {
-				RSTile tile = new RSTile(x, y, locPlane);
-				final Point screen = ctx.calc.tileToScreen(tile);
+                RSTile tile = new RSTile(ctx, x, y, locPlane);
+                final Point screen = ctx.calc.tileToScreen(tile);
 				if (screen == null || !ctx.calc.pointOnScreen(screen)) {
 					continue;
 				}

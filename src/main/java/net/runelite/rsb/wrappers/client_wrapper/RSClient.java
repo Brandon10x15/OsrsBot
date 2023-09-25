@@ -48,7 +48,10 @@ public class RSClient extends BaseClientWrapper {
 
     @SneakyThrows
     private void runOnClientThread(Runnable method) {
-        final var task = new FutureTask<Object>(() -> { method.run();return null; } );
+        final var task = new FutureTask<>(() -> {
+            method.run();
+            return null;
+        });
         runTask(task);
         task.get();
     }

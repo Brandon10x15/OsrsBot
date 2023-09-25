@@ -17,7 +17,7 @@ public class RSPlayer extends RSCharacter {
     private final MethodContext ctx;
 
 	public RSPlayer(final MethodContext ctx, final Player p) {
-        super(ctx);
+		super(ctx);
         this.ctx = ctx;
         this.p = new SoftReference<>(p);
 	}
@@ -35,8 +35,12 @@ public class RSPlayer extends RSCharacter {
 	}
 
 	public int getCombatLevel() {
-		return p.get().getCombatLevel();
-	}
+        Player player = p.get();
+        if (player == null) {
+            return -1;
+        }
+        return player.getCombatLevel();
+    }
 
 	public boolean isLocalPlayerMoving() {
         if (ctx.client.getLocalDestinationLocation() != null) {
@@ -57,12 +61,20 @@ public class RSPlayer extends RSCharacter {
 
 	@Override
 	public String getName() {
-		return p.get().getName();
-	}
+        Player player = p.get();
+        if (player == null) {
+            return null;
+        }
+        return player.getName();
+    }
 
 	public int getTeam() {
-		return p.get().getTeam();
-	}
+        Player player = p.get();
+        if (player == null) {
+            return -1;
+        }
+        return player.getTeam();
+    }
 
 	public boolean isIdle() {
 		return getAnimation() == -1 && !isInCombat();
@@ -82,7 +94,7 @@ public class RSPlayer extends RSCharacter {
 		try {
 			Point screenLoc;
 			for (int i = 0; i < 20; i++) {
-				screenLoc = getScreenLocation();
+                screenLoc = getScreenLocation();
                 if (!isValid() || !ctx.calc.pointOnScreen(screenLoc)) {
                     return false;
                 }
@@ -90,7 +102,7 @@ public class RSPlayer extends RSCharacter {
                     break;
                 }
                 ctx.mouse.move(screenLoc);
-			}
+            }
             MenuEntry[] entries = ctx.menu.getEntries();
 			if (entries.length <= 1) {
 				return false;

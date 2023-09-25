@@ -5,7 +5,6 @@ import net.runelite.client.eventbus.Subscribe;
 import net.runelite.rsb.internal.globval.GlobalWidgetInfo;
 import net.runelite.rsb.methods.MethodContext;
 import net.runelite.rsb.methods.MethodProvider;
-import net.runelite.rsb.methods.Web;
 import net.runelite.rsb.wrappers.common.ClickBox;
 import net.runelite.rsb.wrappers.common.Clickable07;
 
@@ -24,7 +23,7 @@ public class RSWidget extends MethodProvider implements Clickable07 {
 
     public RSWidget(final MethodContext ctx, final Widget widget) {
         super(ctx);
-        this.ctx = Web.methods;
+        this.ctx = ctx;
         this.clickBox = new ClickBox(this.ctx, this);
         if (widget != null) {
             this.id = widget.getId();
@@ -232,7 +231,7 @@ public class RSWidget extends MethodProvider implements Clickable07 {
      */
     @Subscribe
     public RSWidget getComponent(int idx) {
-        return new RSWidget(methods, methods.client.getWidget(GlobalWidgetInfo.TO_GROUP(this.getId()), idx));
+        return new RSWidget(ctx, ctx.client.getWidget(GlobalWidgetInfo.TO_GROUP(this.getId()), idx));
     }
 
     /**
@@ -241,7 +240,7 @@ public class RSWidget extends MethodProvider implements Clickable07 {
      * @return the border thickness or -1 if null
      */
     public int getBorderThickness() {
-        final Widget inter = this.widget;;
+        final Widget inter = this.widget;
         if (inter != null) {
             return inter.getBorderType();
         }

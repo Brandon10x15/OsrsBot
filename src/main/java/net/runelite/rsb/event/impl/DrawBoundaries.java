@@ -1,10 +1,10 @@
 package net.runelite.rsb.event.impl;
 
+import net.runelite.api.Point;
 import net.runelite.rsb.botLauncher.BotLite;
 import net.runelite.rsb.event.listener.PaintListener;
 import net.runelite.rsb.methods.MethodContext;
 import net.runelite.rsb.wrappers.RSTile;
-import net.runelite.api.Point;
 
 import java.awt.*;
 
@@ -23,8 +23,8 @@ public class DrawBoundaries implements PaintListener {
 		if (!ctx.game.isLoggedIn()) {
 			return;
 		}
-		final int blocks[][] = ctx.client.getTileHeights()[ctx.client.getPlane()];
-		final int baseX = ctx.client.getBaseX();
+        final int[][] blocks = ctx.client.getTileHeights()[ctx.client.getPlane()];
+        final int baseX = ctx.client.getBaseX();
 		final int baseY = ctx.client.getBaseY();
 		for (int i = 0; i < screenPoints.length; i++) {
 			for (int j = 0; j < screenPoints[i].length; j++) {
@@ -35,7 +35,7 @@ public class DrawBoundaries implements PaintListener {
 					mini = null;
 				}
 				minimapPoints[i][j] = mini;
-				Point screen = ctx.calc.tileToScreen(new RSTile(x, y, ctx.client.getPlane()), 0, 0, 0);
+                Point screen = ctx.calc.tileToScreen(new RSTile(ctx, x, y, ctx.client.getPlane()), 0, 0, 0);
 				if ((screen.getX() == -1) || (screen.getY() == -1)) {
 					screen = null;
 				}
@@ -107,7 +107,7 @@ public class DrawBoundaries implements PaintListener {
 			}
 		}
 		final Point mini = ctx.players.getMyPlayer().getMinimapLocation();
-		render.setColor(Color.red);
-		render.fillRect((int) mini.getX() - 1, (int) mini.getY() - 1, 2, 2);
+        render.setColor(Color.red);
+        render.fillRect(mini.getX() - 1, mini.getY() - 1, 2, 2);
 	}
 }

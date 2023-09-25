@@ -1,6 +1,7 @@
 package net.runelite.rsb.methods;
 
-import net.runelite.api.*;
+import net.runelite.api.Tile;
+import net.runelite.api.TileItem;
 import net.runelite.rsb.internal.wrappers.Filter;
 import net.runelite.rsb.query.RSGroundItemQueryBuilder;
 import net.runelite.rsb.wrappers.RSGroundItem;
@@ -16,8 +17,9 @@ import java.util.List;
  */
 public class GroundItems extends MethodProvider {
 
-	//This will hold the maximum number of tiles away the client can render
-	private static final int MAX_RENDER_RANGE = 25;
+    //This will hold the maximum number of tiles away the client can render
+    private static final int MAX_RENDER_RANGE = 25;
+    private final MethodContext ctx;
 
 	public static final Filter<RSGroundItem> ALL_FILTER = new Filter<>() {
 		public boolean test(RSGroundItem item) {
@@ -26,7 +28,8 @@ public class GroundItems extends MethodProvider {
 	};
 
 	GroundItems(final MethodContext ctx) {
-		super(ctx);
+        super(ctx);
+        this.ctx = ctx;
 	}
 
 	public RSGroundItemQueryBuilder query() {
@@ -163,8 +166,8 @@ public class GroundItems extends MethodProvider {
 		}
 		List<RSGroundItem> list = new ArrayList<>();
 
-		RSTile rsTile = new RSTile(x, y, methods.client.getPlane());
-		Tile tile = rsTile.getTile(methods);
+        RSTile rsTile = new RSTile(ctx, x, y, methods.client.getPlane());
+        Tile tile = rsTile.getTile(methods);
 		if (tile == null) {
 			return null;
 		}

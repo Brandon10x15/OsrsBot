@@ -6,7 +6,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class QueryResult<T> implements Collection<T> {
-    private List objects;
+    private List<T> objects;
 
     public QueryResult(List<T> list) {
         objects = list;

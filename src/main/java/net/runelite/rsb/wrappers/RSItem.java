@@ -42,7 +42,7 @@ public class RSItem extends MethodProvider implements Clickable07, CacheProvider
         this.def = this.getDefinition(id);
     }
 
-	public RSItem(final MethodContext ctx, final TileItem item) {
+    public RSItem(final MethodContext ctx, final TileItem item) {
         super(ctx);
         this.ctx = ctx;
         this.clickBox = new ClickBox(this.ctx, this);
@@ -240,13 +240,13 @@ public class RSItem extends MethodProvider implements Clickable07, CacheProvider
 
 	public boolean doAction(Predicate<RSMenuNode> predicate) {
 		component.doClick(false);
-		for (RSMenuNode menuNode : methods.chooseOption.getMenuNodes()) {
-			if (predicate.test(menuNode)) {
-				return (component != null)
-						? component.doAction(menuNode.getAction(), menuNode.getTarget())
-						: item.doAction(menuNode.getAction(), menuNode.getTarget());
-			}
-		}
+        for (RSMenuNode menuNode : ctx.chooseOption.getMenuNodes()) {
+            if (predicate.test(menuNode)) {
+                return (component != null)
+                        ? component.doAction(menuNode.getAction(), menuNode.getTarget())
+                        : item.doAction(menuNode.getAction(), menuNode.getTarget());
+            }
+        }
 		return false;
 	}
 

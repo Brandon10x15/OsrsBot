@@ -18,8 +18,10 @@ import java.lang.reflect.Field;
  * Walking related operations.
  */
 public class Walking extends MethodProvider {
+    private final MethodContext ctx;
 	Walking(final MethodContext ctx) {
-		super(ctx);
+        super(ctx);
+        this.ctx = ctx;
 	}
 
 	private RSPath lastPath;
@@ -36,7 +38,7 @@ public class Walking extends MethodProvider {
 		if (tiles == null) {
 			throw new IllegalArgumentException("null waypoint list");
 		}
-		return new RSTilePath(methods, tiles);
+        return new RSTilePath(ctx, tiles);
 	}
 
 	/**
@@ -47,7 +49,7 @@ public class Walking extends MethodProvider {
 	 * @return The path as an RSPath.
 	 */
 	public RSPath getPath(final RSTile destination) {
-		return new RSLocalPath(methods, destination);
+        return new RSLocalPath(ctx, destination);
 	}
 
 	/**
@@ -57,11 +59,14 @@ public class Walking extends MethodProvider {
 	 * @return <code>true</code> if local; otherwise <code>false</code>.
 	 */
 	public boolean isLocal(final RSTile tile) {
-		int[][] flags = methods.client.getCollisionMaps()[methods.game.getPlane()].getFlags();
-		int x = tile.getWorldLocation().getX() - methods.game.getBaseX();
-		int y = tile.getWorldLocation().getY() - methods.game.getBaseY();
-		return (flags != null && x >= 0 && y >= 0 && x < flags.length && y < flags.length);
-	}
+        int[][] flags = null;
+        if (ctx.client.getCollisionMaps() != null) {
+            flags = ctx.client.getCollisionMaps()[ctx.game.getPlane()].getFlags();
+        }
+        int x = tile.getWorldLocation().getX() - ctx.game.getBaseX();
+        int y = tile.getWorldLocation().getY() - ctx.game.getBaseY();
+        return (flags != null && x >= 0 && y >= 0 && x < flags.length && y < flags.length);
+    }
 
 	/**
 	 * Walks one tile towards the given destination using a generated path.
@@ -71,10 +76,10 @@ public class Walking extends MethodProvider {
 	 * <code>false</code>.
 	 */
 	public boolean walkTo(final RSTile destination) {
-		if (destination.equals(lastDestination)
-				&& methods.calc.distanceTo(lastStep) < 10) {
-			return lastPath.traverse();
-		}
+        if (destination.equals(lastDestination)
+                && ctx.calc.distanceTo(lastStep) < 10) {
+            return lastPath.traverse();
+        }
 		lastDestination = destination;
 		lastPath = getPath(destination);
 		if (!lastPath.isValid()) {
@@ -109,37 +114,37 @@ public class Walking extends MethodProvider {
 			if (random(1, 2) == random(1, 2)) {
 				xx += random(0, x);
 			} else {
-				xx -= random(0, x);
-			}
-		}
-		if (y > 0) {
-			if (random(1, 2) == random(1, 2)) {
-				yy += random(0, y);
-			} else {
-				yy -= random(0, y);
-			}
-		}
-		RSTile dest = new RSTile(xx, yy, t.getWorldLocation().getPlane());
-		if (!methods.calc.tileOnMap(dest)) {
-			dest = getClosestTileOnMap(dest);
-		}
-		Point p = methods.calc.tileToMinimap(dest);
-		if (p.getX() != -1 && p.getY() != -1) {
-			methods.mouse.move(p);
-			Point p2 = methods.calc.tileToMinimap(dest);
-			if (p2 == null) { // methods.mouse takes time, if character got far enough (i.e. died) p2 will be null
-				return false;
-			}
-			if (p2.getX() != -1 && p2.getY() != -1) {
-				if (!methods.mouse.getLocation().equals(p2)) {//We must've moved while walking, move again!
-					methods.mouse.move(p2);
-				}
-				if (!methods.mouse.getLocation().equals(p2)) {//Get exact since we're moving... should be removed?
-					methods.mouse.hop(p2);
-				}
-				methods.mouse.click(true);
-				return true;
-			}
+                xx -= random(0, x);
+            }
+        }
+        if (y > 0) {
+            if (random(1, 2) == random(1, 2)) {
+                yy += random(0, y);
+            } else {
+                yy -= random(0, y);
+            }
+        }
+        RSTile dest = new RSTile(ctx, xx, yy, t.getWorldLocation().getPlane());
+        if (!ctx.calc.tileOnMap(dest)) {
+            dest = getClosestTileOnMap(dest);
+        }
+        Point p = ctx.calc.tileToMinimap(dest);
+        if (p.getX() != -1 && p.getY() != -1) {
+            ctx.mouse.move(p);
+            Point p2 = ctx.calc.tileToMinimap(dest);
+            if (p2 == null) { // ctx.mouse takes time, if character got far enough (i.e. died) p2 will be null
+                return false;
+            }
+            if (p2.getX() != -1 && p2.getY() != -1) {
+                if (!ctx.mouse.getLocation().equals(p2)) {//We must've moved while walking, move again!
+                    ctx.mouse.move(p2);
+                }
+                if (!ctx.mouse.getLocation().equals(p2)) {//Get exact since we're moving... should be removed?
+                    ctx.mouse.hop(p2);
+                }
+                ctx.mouse.click(true);
+                return true;
+            }
 		}
 		return false;
 	}
@@ -154,19 +159,19 @@ public class Walking extends MethodProvider {
 	public boolean walkTileMM(final RSTile t, final int r) {
 		int x = t.getWorldLocation().getX();
 		int y = t.getWorldLocation().getY();
-		if (random(1, 2) == random(1, 2)) {
-			x += random(0, r);
-		} else {
-			x -= random(0, r);
-		}
-		if (random(1, 2) == random(1, 2)) {
-			y += random(0, r);
-		} else {
-			y -= random(0, r);
-		}
-		RSTile dest = new RSTile(x, y);
-		return !methods.players.getMyPlayer().getLocation().equals(dest) && walkTileMM(dest, 0, 0);
-	}
+        if (random(1, 2) == random(1, 2)) {
+            x += random(0, r);
+        } else {
+            x -= random(0, r);
+        }
+        if (random(1, 2) == random(1, 2)) {
+            y += random(0, r);
+        } else {
+            y -= random(0, r);
+        }
+        RSTile dest = new RSTile(ctx, x, y);
+        return !ctx.players.getMyPlayer().getLocation().equals(dest) && walkTileMM(dest, 0, 0);
+    }
 
 	/**
 	 * Walks to a tile using onScreen clicks and not the MiniMap. If the tile is
@@ -177,7 +182,7 @@ public class Walking extends MethodProvider {
 	 * @return True if successful.
 	 */
 	public boolean walkTileOnScreen(final RSTile tileToWalk) {
-		return methods.tiles.doAction(methods.calc.getTileOnScreen(tileToWalk), "Walk ");
+        return ctx.tiles.doAction(ctx.calc.getTileOnScreen(tileToWalk), "Walk ");
 	}
 
 	/**
@@ -188,7 +193,7 @@ public class Walking extends MethodProvider {
 	 */
 	public boolean setRun(final boolean enable) {
 		if (isRunEnabled() != enable) {
-			return methods.interfaces.getComponent(GlobalWidgetInfo.MINIMAP_RUN_ORB).doClick();
+            return ctx.interfaces.getComponent(GlobalWidgetInfo.MINIMAP_RUN_ORB).doClick();
 		}
 		return false;
 	}
@@ -202,7 +207,7 @@ public class Walking extends MethodProvider {
 	 */
 	@Deprecated
 	public RSTile[] findPath(RSTile destination) {
-		RSLocalPath path = new RSLocalPath(methods, destination);
+        RSLocalPath path = new RSLocalPath(ctx, destination);
 		if (path.isValid()) {
 			RSTilePath tp = path.getCurrentTilePath();
 			if (tp != null) {
@@ -232,15 +237,15 @@ public class Walking extends MethodProvider {
 	 * @return Returns the closest tile to the destination on the minimap.
 	 */
 	public RSTile getClosestTileOnMap(final RSTile tile) {
-		if (!methods.calc.tileOnMap(tile) && methods.game.isLoggedIn()) {
-			RSTile loc = methods.players.getMyPlayer().getLocation();
-			RSTile walk = new RSTile((loc.getWorldLocation().getX() + tile.getWorldLocation().getX()) / 2,
-					(loc.getWorldLocation().getY() + tile.getWorldLocation().getY()) / 2, tile.getWorldLocation().getPlane());
-			return methods.calc.tileOnMap(walk) ? walk
-					: getClosestTileOnMap(walk);
-		}
-		return tile;
-	}
+        if (!ctx.calc.tileOnMap(tile) && ctx.game.isLoggedIn()) {
+            RSTile loc = ctx.players.getMyPlayer().getLocation();
+            RSTile walk = new RSTile(ctx, (loc.getWorldLocation().getX() + tile.getWorldLocation().getX()) / 2,
+                    (loc.getWorldLocation().getY() + tile.getWorldLocation().getY()) / 2, tile.getWorldLocation().getPlane());
+            return ctx.calc.tileOnMap(walk) ? walk
+                    : getClosestTileOnMap(walk);
+        }
+        return tile;
+    }
 
 	/**
 	 * Returns whether run is enabled.
@@ -248,8 +253,8 @@ public class Walking extends MethodProvider {
 	 * @return <code>true</code> if run mode is enabled; otherwise <code>false</code>.
 	 */
 	public boolean isRunEnabled() {
-		return methods.clientLocalStorage.getVarpValueAt(VarpIndices.TOGGLE_RUN)
-				== VarpValues.RUN_ENABLED.getValue();
+        return ctx.clientLocalStorage.getVarpValueAt(VarpIndices.TOGGLE_RUN)
+                == VarpValues.RUN_ENABLED.getValue();
 	}
 
 	/**
@@ -258,7 +263,7 @@ public class Walking extends MethodProvider {
 	 * @return The player's current run energy.
 	 */
 	public int getEnergy() {
-		return methods.client.getEnergy();
+        return ctx.client.getEnergy();
 	}
 
 	/**
@@ -267,7 +272,7 @@ public class Walking extends MethodProvider {
 	 * @return The player's current run energy in percentage.
 	 */
 	public int getEnergyPercentage() {
-		return methods.client.getEnergy() / 100;
+        return ctx.client.getEnergy() / 100;
 	}
 
 	/**
@@ -277,7 +282,7 @@ public class Walking extends MethodProvider {
 	 */
 
 	public int getWeight() {
-		return methods.client.getWeight();
+        return ctx.client.getWeight();
 	}
 
 
@@ -289,7 +294,7 @@ public class Walking extends MethodProvider {
 	 * @return <code>true</code> if the player has the slowed depletion active; otherwise <code>false</code>.
 	 */
 	public boolean hasDepletionActive() {
-		return methods.client.getVarbitValue(Varbits.RUN_SLOWED_DEPLETION_ACTIVE) == 1;
+        return ctx.client.getVarbitValue(Varbits.RUN_SLOWED_DEPLETION_ACTIVE) == 1;
 	}
 
 	/**
@@ -299,11 +304,11 @@ public class Walking extends MethodProvider {
 	 * @return The current destination tile, or null.
 	 */
 	public RSTile getDestination() {
-		LocalPoint a = methods.client.getLocalDestinationLocation();
+        LocalPoint a = ctx.client.getLocalDestinationLocation();
 
-		return (a != null) ? new RSTile(a.getX(),
-				a.getY(), methods.client.getPlane()) : null;
-	}
+        return (a != null) ? new RSTile(ctx, a.getX(),
+                a.getY(), ctx.client.getPlane()) : null;
+    }
 
 	/**
 	 * Checks the obfuscated field to determine if it is collisiondata or not. If it is, then the method will return
@@ -315,7 +320,7 @@ public class Walking extends MethodProvider {
 	public String getObType(Field field) {
 		String typeName = null;
 		try {
-			typeName = ((CollisionData[]) field.get(methods.client.wrappedClient)).getClass().getTypeName();
+            typeName = ((CollisionData[]) field.get(ctx.client.wrappedClient)).getClass().getTypeName();
 		} catch (IllegalAccessException | ClassCastException e) {
 			//This will cause a number of class cast exceptions while searching for a match
 			//This is a byproduct of using reflection and attempting to create an algorithm
@@ -428,9 +433,9 @@ public class Walking extends MethodProvider {
 	public boolean walkPathOnScreen(RSTile[] path, int maxDist) {
 		RSTile next = nextTile(path, maxDist);
 		if (next != null) {
-			RSTile os = methods.calc.getTileOnScreen(next);
-			return os != null && methods.tiles.doAction(os, "Walk");
-		}
+            RSTile os = ctx.calc.getTileOnScreen(next);
+            return os != null && ctx.tiles.doAction(os, "Walk");
+        }
 		return false;
 	}
 
@@ -479,8 +484,8 @@ public class Walking extends MethodProvider {
 		int dist = 99;
 		int closest = -1;
 		for (int i = path.length - 1; i >= 0; i--) {
-			RSTile tile = path[i];
-			int d = methods.calc.distanceTo(tile);
+            RSTile tile = path[i];
+            int d = ctx.calc.distanceTo(tile);
 			if (d < dist) {
 				dist = d;
 				closest = i;
@@ -491,11 +496,11 @@ public class Walking extends MethodProvider {
 
 		for (int i = closest; i < path.length; i++) {
 
-			if (methods.calc.distanceTo(path[i]) <= skipDist) {
-				feasibleTileIndex = i;
-			} else {
-				break;
-			}
+            if (ctx.calc.distanceTo(path[i]) <= skipDist) {
+                feasibleTileIndex = i;
+            } else {
+                break;
+            }
 		}
 
 		if (feasibleTileIndex == -1) {

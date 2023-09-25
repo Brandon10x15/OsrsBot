@@ -41,7 +41,7 @@ public class RSGroundItem extends MethodProvider implements Clickable07, Positio
                 return (tile.getItemLayer().getTop() != null) ?
                         new RSGroundObjectModel(ctx, tile.getItemLayer().getTop().getModel(), tile) :
                         new RSGroundObjectModel(ctx, groundItems.get(0).getModel(), tile);
-			}
+            }
 		}
 		return null;
 	}
@@ -64,19 +64,19 @@ public class RSGroundItem extends MethodProvider implements Clickable07, Positio
 	 * @return <code>true</code> if the action was clicked; otherwise <code>false</code>.
 	 */
 	public boolean doAction(final String action, final String option) {
-		if (getClickBox().doAction(action, option)) {
-			return true;
-		}
+        if (getClickBox().doAction(action, option)) {
+            return true;
+        }
         return ctx.tiles.doAction(getLocation(), random(0.45, 0.55), random(0.45, 0.55), 0,
                 action, option);
-	}
+    }
 
 	public RSItem getItem() {
 		return groundItem;
 	}
 
 	public RSTile getLocation() {
-		return new RSTile(location);
+        return new RSTile(ctx, location);
 	}
 
 	public boolean isOnScreen() {
