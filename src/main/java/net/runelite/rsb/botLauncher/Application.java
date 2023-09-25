@@ -45,6 +45,7 @@ public class Application {
 	 * @throws IOException If the file isn't found or is inaccessible then an IOException has occurred.
 	 */
 	private static void checkForCacheAndLoad() throws IOException {
+
         String gameCacheLocation = GlobalConfiguration.Paths.getRuneLiteGameCacheDirectory();
         String objectCacheLocation = GlobalConfiguration.Paths.getObjectsCacheDirectory();
         String itemCacheLocation = GlobalConfiguration.Paths.getItemsCacheDirectory();
@@ -53,19 +54,7 @@ public class Application {
         //TODO Some sort of better validation here
         //Add a version check
 
-        if (!new File(itemCacheLocation).exists()) {
-            new File(itemCacheLocation).mkdir();
-        }
-        if (!new File(objectCacheLocation).exists()) {
-            new File(objectCacheLocation).mkdir();
-        }
-        if (!new File(npcCacheLocation).exists()) {
-            new File(npcCacheLocation).mkdir();
-        }
-        if (!new File(spriteCacheLocation).exists()) {
-            new File(spriteCacheLocation).mkdir();
-        }
-        if (new File(itemCacheLocation).getTotalSpace() < 100) {
+        if ((!new File(itemCacheLocation).exists()) || new File(itemCacheLocation).getTotalSpace() < 100) {
             String[] itemArgs = {"--cache", gameCacheLocation,
                     "--items", itemCacheLocation};
             String[] objectArgs = {"--cache", gameCacheLocation,
@@ -74,13 +63,17 @@ public class Application {
                     "--npcs", npcCacheLocation};
             String[] spriteArgs = {"--cache", gameCacheLocation,
                     "--sprites", spriteCacheLocation};
+
             net.runelite.cache.Cache.main(itemArgs);
             net.runelite.cache.Cache.main(objectArgs);
             net.runelite.cache.Cache.main(npcArgs);
-            net.runelite.cache.Cache.main(spriteArgs);
+            if (!new File(spriteCacheLocation).exists()) {
+                new File(spriteCacheLocation).mkdir();
+                net.runelite.cache.Cache.main(spriteArgs);
+            }
+        } else {
+            CacheProvider.fillFileCache();
         }
-        CacheProvider.fillFileCache();
-
     }
 
 	public static void setBot(int index) {

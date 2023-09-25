@@ -8,30 +8,31 @@ import net.runelite.rsb.wrappers.common.CacheProvider;
 import net.runelite.rsb.wrappers.common.Positionable;
 
 import java.io.File;
+import java.lang.ref.SoftReference;
 import java.util.HashMap;
 
 public class RSNPC extends RSCharacter implements CacheProvider<NpcDefinition> {
     private static HashMap<Integer, NpcDefinition> npcDefinitionCache;
     private static HashMap<Integer, File> npcFileCache;
-    private final NPC npc;
+    private final SoftReference<NPC> npc;
     private final int id;
     private final NpcDefinition def;
 
     public RSNPC(final MethodContext ctx, final NPC npc) {
         super(ctx);
-        this.npc = npc;
+        this.npc = new SoftReference<>(npc);
         this.id = npc.getId();
         this.def = npc.getId() == -1 ? null : (NpcDefinition) createDefinition(npc.getId());
     }
 
     @Override
     public Actor getAccessor() {
-        return this.npc;
+        return this.npc.get();
     }
 
     @Override
     public Actor getInteracting() {
-        return this.getAccessor().getInteracting();
+        return getAccessor().getInteracting();
     }
 
     public String[] getActions() {
@@ -60,7 +61,7 @@ public class RSNPC extends RSCharacter implements CacheProvider<NpcDefinition> {
     }
     @Override
     public String getName() {
-        return this.getAccessor().getName(); // Pulls name from NPC.
+        return getAccessor().getName(); // Pulls name from NPC.
         /*
         NpcDefinition def = getDef();
         if (def != null) {
@@ -71,7 +72,7 @@ public class RSNPC extends RSCharacter implements CacheProvider<NpcDefinition> {
 
     @Override
     public int getLevel() {
-        NPC c = this.npc;
+        NPC c = this.npc.get();
         if (c == null) {
             return -1;
         } else {

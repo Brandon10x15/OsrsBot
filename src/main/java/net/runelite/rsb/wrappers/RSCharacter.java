@@ -112,15 +112,9 @@ public abstract class RSCharacter extends MethodProvider implements Clickable07,
     public RSModel getModel() {
         Actor actor = getAccessor();
         if (actor != null) {
-            try {
-                if (actor.getName() != null) {
-                    return null;
-                }
-                Model model = actor.getModel();
-                if (model != null) {
-                    return new RSCharacterModel(methods, model, actor);
-                }
-            } catch (ArrayIndexOutOfBoundsException ignore) {
+            Model model = actor.getModel();
+            if (model != null) {
+                return new RSCharacterModel(methods, model, actor);
             }
         }
         return null;
@@ -312,16 +306,7 @@ public abstract class RSCharacter extends MethodProvider implements Clickable07,
     }
 
     public Shape getClickShape() {
-        Shape shape = null;
-        if (this.getAccessor() == null) {
-            return shape;
-        }
-        try {
-            shape = this.getAccessor().getConvexHull();
-        } catch (NullPointerException e) {
-            e.printStackTrace();
-        }
-        return shape;
+        return getAccessor().getConvexHull();
     }
     public ClickBox getClickBox() {
         return clickBox;

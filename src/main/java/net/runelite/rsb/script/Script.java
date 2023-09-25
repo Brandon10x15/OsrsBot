@@ -271,9 +271,7 @@ public abstract class Script extends Methods implements EventListener, Runnable 
                             timeOut = loop();
                         } catch (ThreadDeath td) {
                             break;
-                        } catch (NullPointerException ex) {
-                            log.warn("Null pointer exception from script: ", ex);
-                        } catch (Exception ex) {
+                        } catch (Exception | Error ex) {
                             log.warn("Uncaught exception from script: ", ex);
                         }
                         if (timeOut == -1) {

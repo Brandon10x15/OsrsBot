@@ -58,20 +58,16 @@ public class ClickBox implements Clickable07, PaintListener {
 
     @Override
     public boolean doHover() {
-        try {
-            Point point = getRandomPoint();
-            if (point != null && isClickable()) {
-                for (int i = 0; i < 3; i++) {
-                    if (!contains(methods.mouse.getLocation())) {
-                        methods.mouse.move(point);
-                    }
-                    if (contains(methods.mouse.getLocation())) {
-                        return true;
-                    }
+        Point point = getRandomPoint();
+        if (point != null && isClickable()) {
+            for (int i = 0; i < 3; i++) {
+                if (!contains(methods.mouse.getLocation())) {
+                    methods.mouse.move(point);
+                }
+                if (contains(methods.mouse.getLocation())) {
+                    return true;
                 }
             }
-        } catch (Exception | Error e) {
-            e.printStackTrace();
         }
         return false;
     }
