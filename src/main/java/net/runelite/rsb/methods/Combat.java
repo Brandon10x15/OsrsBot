@@ -8,16 +8,17 @@ import net.runelite.api.*;
 import net.runelite.http.api.item.ItemEquipmentStats;
 import net.runelite.http.api.item.ItemStats;
 import net.runelite.rsb.botLauncher.BotLite;
-import net.runelite.rsb.internal.globval.VarpIndices;
 import net.runelite.rsb.internal.globval.GlobalWidgetInfo;
+import net.runelite.rsb.internal.globval.VarpIndices;
 import net.runelite.rsb.internal.globval.VarpValues;
 import net.runelite.rsb.internal.globval.enums.InterfaceTab;
 import net.runelite.rsb.internal.globval.enums.Prayers;
 import net.runelite.rsb.internal.globval.enums.Spell;
-import net.runelite.rsb.wrappers.*;
+import net.runelite.rsb.wrappers.RSItem;
+import net.runelite.rsb.wrappers.RSNPC;
+import net.runelite.rsb.wrappers.RSWidget;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Map;
 
 import static net.runelite.rsb.botLauncher.Application.getBot;
@@ -28,8 +29,10 @@ import static net.runelite.rsb.botLauncher.Application.getBot;
 @Slf4j
 public class Combat extends MethodProvider {
 
+    public final MethodContext ctx;
 	public Combat(MethodContext ctx) {
-		super(ctx);
+        super(ctx);
+        this.ctx = ctx;
 	}
 
 	/**

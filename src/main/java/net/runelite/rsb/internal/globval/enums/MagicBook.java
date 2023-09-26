@@ -1,33 +1,29 @@
 package net.runelite.rsb.internal.globval.enums;
 
-import static net.runelite.rsb.methods.MethodProvider.methods;
-
 import net.runelite.api.ItemID;
 import net.runelite.api.Skill;
 import net.runelite.rsb.internal.globval.GlobalWidgetInfo;
+import net.runelite.rsb.methods.MethodContext;
 import net.runelite.rsb.wrappers.RSWidget;
 
 import java.util.Arrays;
 
-public enum MagicBook
-{
+public enum MagicBook {
     STANDARD(0),
     ANCIENT(1),
-    LUNAR(2),
+    LUNAR2(2),
     NECROMANCY(3);
 
     private static final int SPELLBOOK_VARBIT = 4070;
 
     private final int varbitValue;
 
-    MagicBook(int varbitValue)
-    {
+    MagicBook(int varbitValue) {
         this.varbitValue = varbitValue;
     }
 
-    public static MagicBook getCurrent()
-    {
-        return Arrays.stream(values()).filter(x -> methods.client.getVarbitValue(SPELLBOOK_VARBIT) == x.varbitValue)
+    public static MagicBook getCurrent(MethodContext ctx) {
+        return Arrays.stream(values()).filter(x -> ctx.client.getVarbitValue(SPELLBOOK_VARBIT) == x.varbitValue)
                 .findFirst().orElse(null);
     }
 
@@ -631,45 +627,38 @@ public enum MagicBook
         }
 
         @Override
-        public RSWidget getWidget()
-        {
-            return methods.interfaces.getComponent(widgetInfo);
+        public RSWidget getWidget(MethodContext ctx) {
+            return ctx.interfaces.getComponent(widgetInfo);
         }
 
         @Override
-        public boolean canCast()
-        {
-            if (getCurrent() != STANDARD)
-            {
+        public boolean canCast(MethodContext ctx) {
+            if (getCurrent(ctx) != STANDARD) {
                 return false;
             }
 
-            if (members && !methods.worldHopper.isCurrentWorldMembers())
-            {
+            if (members && !ctx.worldHopper.isCurrentWorldMembers()) {
                 return false;
             }
 
             if (this == HOME_TELEPORT)
             {
-                return methods.magic.isHomeTeleportOnCooldown();
+                return ctx.magic.isHomeTeleportOnCooldown();
             }
 
-            if (level > methods.skills.getRealLevel(Skill.MAGIC) || level > methods.skills.getCurrentLevel(Skill.MAGIC))
-            {
+            if (level > ctx.skills.getRealLevel(Skill.MAGIC) || level > ctx.skills.getCurrentLevel(Skill.MAGIC)) {
                 return false;
             }
 
-            if (this == ARDOUGNE_TELEPORT && methods.client.getVarpValue(165) < 30)
-            {
+            if (this == ARDOUGNE_TELEPORT && ctx.client.getVarpValue(165) < 30) {
                 return false;
             }
 
-            if (this == TROLLHEIM_TELEPORT && methods.client.getVarpValue(335) < 110)
-            {
+            if (this == TROLLHEIM_TELEPORT && ctx.client.getVarpValue(335) < 110) {
                 return false;
             }
 
-            return haveEquipment() && haveItem() && haveRunesAvailable();
+            return haveEquipment(ctx) && haveItem(ctx) && haveRunesAvailable();
         }
 
         public boolean haveRunesAvailable()
@@ -689,36 +678,32 @@ public enum MagicBook
             return baseHit;
         }
 
-        public boolean haveEquipment()
-        {
-            switch (this)
-            {
+        public boolean haveEquipment(MethodContext ctx) {
+            switch (this) {
                 case IBAN_BLAST:
-                    return methods.equipment.containsOneOf(ItemID.IBANS_STAFF, ItemID.IBANS_STAFF_1410, ItemID.IBANS_STAFF_U);
+                    return ctx.equipment.containsOneOf(ItemID.IBANS_STAFF, ItemID.IBANS_STAFF_1410, ItemID.IBANS_STAFF_U);
                 case MAGIC_DART:
-                    return methods.equipment.containsOneOf(ItemID.SLAYERS_STAFF_E, ItemID.SLAYERS_STAFF, ItemID.STAFF_OF_THE_DEAD, ItemID.STAFF_OF_THE_DEAD_23613, ItemID.TOXIC_STAFF_OF_THE_DEAD, ItemID.STAFF_OF_LIGHT, ItemID.STAFF_OF_BALANCE);
+                    return ctx.equipment.containsOneOf(ItemID.SLAYERS_STAFF_E, ItemID.SLAYERS_STAFF, ItemID.STAFF_OF_THE_DEAD, ItemID.STAFF_OF_THE_DEAD_23613, ItemID.TOXIC_STAFF_OF_THE_DEAD, ItemID.STAFF_OF_LIGHT, ItemID.STAFF_OF_BALANCE);
                 case SARADOMIN_STRIKE:
-                    return methods.equipment.containsOneOf(ItemID.SARADOMIN_STAFF, ItemID.STAFF_OF_LIGHT);
+                    return ctx.equipment.containsOneOf(ItemID.SARADOMIN_STAFF, ItemID.STAFF_OF_LIGHT);
                 case FLAMES_OF_ZAMORAK:
-                    return methods.equipment.containsOneOf(ItemID.ZAMORAK_STAFF, ItemID.STAFF_OF_THE_DEAD, ItemID.STAFF_OF_THE_DEAD_23613, ItemID.TOXIC_STAFF_OF_THE_DEAD);
+                    return ctx.equipment.containsOneOf(ItemID.ZAMORAK_STAFF, ItemID.STAFF_OF_THE_DEAD, ItemID.STAFF_OF_THE_DEAD_23613, ItemID.TOXIC_STAFF_OF_THE_DEAD);
                 case CLAWS_OF_GUTHIX:
-                    return methods.equipment.containsOneOf(ItemID.GUTHIX_STAFF, ItemID.VOID_KNIGHT_MACE, ItemID.STAFF_OF_BALANCE);
+                    return ctx.equipment.containsOneOf(ItemID.GUTHIX_STAFF, ItemID.VOID_KNIGHT_MACE, ItemID.STAFF_OF_BALANCE);
                 default:
                     return true;
             }
         }
 
-        public boolean haveItem()
-        {
-            switch (this)
-            {
+        public boolean haveItem(MethodContext ctx) {
+            switch (this) {
                 case APE_ATOLL_TELEPORT_STANDARD:
-                    return methods.inventory.contains(ItemID.BANANA);
+                    return ctx.inventory.contains(ItemID.BANANA);
                 case CHARGE_AIR_ORB:
                 case CHARGE_WATER_ORB:
                 case CHARGE_EARTH_ORB:
                 case CHARGE_FIRE_ORB:
-                    return methods.inventory.contains(ItemID.UNPOWERED_ORB);
+                    return ctx.inventory.contains(ItemID.UNPOWERED_ORB);
                 default:
                     return true;
             }
@@ -951,30 +936,25 @@ public enum MagicBook
         }
 
         @Override
-        public RSWidget getWidget()
-        {
-            return methods.interfaces.getComponent(widgetInfo);
+        public RSWidget getWidget(MethodContext ctx) {
+            return ctx.interfaces.getComponent(widgetInfo);
         }
 
-        public boolean canCast()
-        {
-            if (getCurrent() != ANCIENT)
-            {
+        public boolean canCast(MethodContext ctx) {
+            if (getCurrent(ctx) != ANCIENT) {
                 return false;
             }
 
-            if (!methods.worldHopper.isCurrentWorldMembers())
-            {
+            if (!ctx.worldHopper.isCurrentWorldMembers()) {
                 return false;
             }
 
             if (this == EDGEVILLE_HOME_TELEPORT)
             {
-                return methods.magic.isHomeTeleportOnCooldown();
+                return ctx.magic.isHomeTeleportOnCooldown();
             }
 
-            if (level > methods.skills.getRealLevel(Skill.MAGIC) || level > methods.skills.getCurrentLevel(Skill.MAGIC))
-            {
+            if (level > ctx.skills.getRealLevel(Skill.MAGIC) || level > ctx.skills.getCurrentLevel(Skill.MAGIC)) {
                 return false;
             }
 
@@ -1335,30 +1315,26 @@ public enum MagicBook
         }
 
         @Override
-        public RSWidget getWidget()
-        {
-            return methods.interfaces.getComponent(widgetInfo);
+        public RSWidget getWidget(MethodContext ctx) {
+            return ctx.interfaces.getComponent(widgetInfo);
         }
 
-        public boolean canCast()
-        {
-            if (getCurrent() != LUNAR)
-            {
+        public boolean canCast(MethodContext ctx) {
+
+            if (getCurrent(ctx) != LUNAR2) {
                 return false;
             }
 
-            if (!methods.worldHopper.isCurrentWorldMembers())
-            {
+
+            if (!ctx.worldHopper.isCurrentWorldMembers()) {
                 return false;
             }
 
-            if (this == LUNAR_HOME_TELEPORT)
-            {
-                return methods.magic.isHomeTeleportOnCooldown();
+            if (this == LUNAR_HOME_TELEPORT) {
+                return ctx.magic.isHomeTeleportOnCooldown();
             }
 
-            if (level > methods.skills.getRealLevel(Skill.MAGIC) || level > methods.skills.getCurrentLevel(Skill.MAGIC))
-            {
+            if (level > ctx.skills.getRealLevel(Skill.MAGIC) || level > ctx.skills.getCurrentLevel(Skill.MAGIC)) {
                 return false;
             }
 
@@ -1710,30 +1686,25 @@ public enum MagicBook
         }
 
         @Override
-        public RSWidget getWidget()
-        {
-            return methods.interfaces.getComponent(widgetInfo);
+        public RSWidget getWidget(MethodContext ctx) {
+            return ctx.interfaces.getComponent(widgetInfo);
         }
 
-        public boolean canCast()
-        {
-            if (getCurrent() != NECROMANCY)
-            {
+        public boolean canCast(MethodContext ctx) {
+            if (getCurrent(ctx) != NECROMANCY) {
                 return false;
             }
 
-            if (!methods.worldHopper.isCurrentWorldMembers())
-            {
+            if (!ctx.worldHopper.isCurrentWorldMembers()) {
                 return false;
             }
 
             if (this == ARCEUUS_HOME_TELEPORT)
             {
-                return methods.magic.isHomeTeleportOnCooldown();
+                return ctx.magic.isHomeTeleportOnCooldown();
             }
 
-            if (level > methods.skills.getRealLevel(Skill.MAGIC) || level > methods.skills.getCurrentLevel(Skill.MAGIC))
-            {
+            if (level > ctx.skills.getRealLevel(Skill.MAGIC) || level > ctx.skills.getCurrentLevel(Skill.MAGIC)) {
                 return false;
             }
 

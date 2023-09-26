@@ -10,8 +10,10 @@ import net.runelite.rsb.methods.MethodContext;
 public class RSGroundObjectModel extends RSModel {
     private final Tile tile;
 
+    public final MethodContext ctx;
     RSGroundObjectModel(MethodContext ctx, Model model, Tile tile) {
         super(ctx, model);
+        this.ctx = ctx;
         this.tile = tile;
     }
 
@@ -35,7 +37,7 @@ public class RSGroundObjectModel extends RSModel {
             return itemLayer.getZ() - itemLayer.getHeight();
         }
         else {
-            return Perspective.getTileHeight(methods.client, new LocalPoint(getLocalX(), getLocalY()), methods.client.getPlane());
+            return Perspective.getTileHeight(ctx.client, new LocalPoint(getLocalX(), getLocalY()), ctx.client.getPlane());
         }
     }
 }

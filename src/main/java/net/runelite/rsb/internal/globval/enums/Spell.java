@@ -1,19 +1,16 @@
 package net.runelite.rsb.internal.globval.enums;
 
 
-import net.runelite.api.ItemID;
-import net.runelite.rsb.internal.globval.GlobalWidgetInfo;
+import net.runelite.rsb.methods.MethodContext;
 import net.runelite.rsb.wrappers.RSWidget;
-
-import static net.runelite.rsb.methods.MethodProvider.methods;
 
 public interface Spell
 {
     int getLevel();
 
-    RSWidget getWidget();
+    RSWidget getWidget(MethodContext ctx);
 
-    boolean canCast();
+    boolean canCast(MethodContext ctx);
 
     public int getBaseHit();
 

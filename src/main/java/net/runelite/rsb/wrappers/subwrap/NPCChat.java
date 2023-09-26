@@ -10,8 +10,10 @@ import java.util.stream.Stream;
 
 public class NPCChat extends Interfaces {
 
+    public final MethodContext ctx;
     public NPCChat(MethodContext ctx) {
         super(ctx);
+        this.ctx = ctx;
     }
 
     public String getMessage() {
@@ -95,7 +97,7 @@ public class NPCChat extends Interfaces {
                 RSWidget[] widgets = getComponent(GlobalWidgetInfo.DIALOG_DYNAMIC_CONTAINER).getComponents();
                 for (int i = 1; i < widgets.length; i++) {
                     if (widgets[i].containsText(option)) {
-                        methods.keyboard.sendText(String.valueOf(i), false);
+                        ctx.keyboard.sendText(String.valueOf(i), false);
                         return true;
                     }
                 }
@@ -126,7 +128,7 @@ public class NPCChat extends Interfaces {
             if (hotKey) {
                 RSWidget[] widgets = getComponent(GlobalWidgetInfo.DIALOG_DYNAMIC_CONTAINER).getComponents();
                 if (option >= 0 && option < widgets.length) {
-                    methods.keyboard.sendText(String.valueOf((option == 0) ? 1 : option), false);
+                    ctx.keyboard.sendText(String.valueOf((option == 0) ? 1 : option), false);
                     return true;
                 }
             } else {

@@ -2,10 +2,9 @@ package net.runelite.rsb.internal.globval.enums;
 
 import net.runelite.api.widgets.Widget;
 import net.runelite.rsb.internal.globval.GlobalWidgetInfo;
+import net.runelite.rsb.methods.MethodContext;
 
 import java.awt.event.KeyEvent;
-
-import static net.runelite.rsb.methods.MethodProvider.methods;
 
 /**
  * An enumerated type representing the interface tabs and their WidgetInfo.
@@ -98,15 +97,15 @@ public enum InterfaceTab {
         return hotkey;
     }
 
-    public Widget getFixedClassicWidget() {
-        return methods.client.getWidget(fixedClassicInfo.getGroupId(), fixedClassicInfo.getChildId());
+    public Widget getFixedClassicWidget(MethodContext ctx) {
+        return ctx.client.getWidget(fixedClassicInfo.getGroupId(), fixedClassicInfo.getChildId());
     }
 
-    public Widget getResizableClassicWidget() {
-        return methods.client.getWidget(resizableClassicInfo.getGroupId(), resizableClassicInfo.getChildId());
+    public Widget getResizableClassicWidget(MethodContext ctx) {
+        return ctx.client.getWidget(resizableClassicInfo.getGroupId(), resizableClassicInfo.getChildId());
     }
 
-    public Widget getResizableModernWidget() {
-        return methods.client.getWidget(resizableModernInfo.getGroupId(), resizableModernInfo.getChildId());
+    public Widget getResizableModernWidget(MethodContext ctx) {
+        return ctx.client.getWidget(resizableModernInfo.getGroupId(), resizableModernInfo.getChildId());
     }
 }
